@@ -2,7 +2,8 @@ import asyncio
 import io
 import json
 import logging
-from dataclasses import asdict
+from collections.abc import Iterator
+from dataclasses import asdict, astuple, dataclass
 from datetime import date
 from typing import Literal
 
@@ -13,8 +14,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_db
 from backend.models import VpcOffer
-from backend.services.access import Access, market_codes, require_any
+from backend.services.access import (
+    Access, market_codes, require_any, split_names,
+)
 from backend.services.audit import record
+from backend.services.cache import LruCache, cached
 from backend.services.vpc import analytics as an
 from backend.services.vpc import insights as ins
 from backend.services.vpc.dataset import Dataset, Row, current_dataset
@@ -36,6 +40,14 @@ Sort = Literal[
 EXPORT_LIMIT = 50_000
 SUGGEST_LIMIT = 8
 TOP_MNN = 8
+PAGE_SIZE = 50
+FACTORY_LIMIT = 2000
+
+CACHE = LruCache(max_items=500)
+ROWS = LruCache(max_items=32)
+
+Scope = tuple[tuple[str, ...] | None, tuple[str, ...] | None]
+FULL: Scope = (None, None)
 
 TIMELINE = (
     ("Вб", ("Вб",)),
@@ -86,23 +98,50 @@ def filters_dep(
     )
 
 
-async def _scoped(
-    db: AsyncSession, access: Access,
-) -> tuple[Dataset, list[Row]]:
+@dataclass(frozen=True)
+class View:
+    ds: Dataset
+    rows: list[Row]
+    scope: Scope
+
+    def key(self, *parts) -> tuple:
+        return (self.ds.import_id, self.ds.uploaded_at, self.scope, *parts)
+
+
+async def scope_of(db: AsyncSession, access: Access) -> Scope:
+    codes = await market_codes(db, access.market_ids)
+    names = access.own_names
+    return (
+        None if codes is None else tuple(codes),
+        None if names is None else tuple(sorted(names)),
+    )
+
+
+def _owned(rows: list[Row], names: tuple[str, ...]) -> list[Row]:
+    own = frozenset(names)
+    return [
+        r for r in rows
+        if split_names(r.bdm) & own or split_names(r.analyst) & own
+    ]
+
+
+def view(ds: Dataset, scope: Scope) -> View:
+    key = (ds.import_id, ds.uploaded_at, scope)
+    rows = ROWS.get(key)
+    if rows is None:
+        codes, names = scope
+        rows = an.scope(ds.rows, codes)
+        if names is not None:
+            rows = _owned(rows, names)
+        ROWS.set(key, rows)
+    return View(ds, rows, scope)
+
+
+async def _scoped(db: AsyncSession, access: Access) -> View:
     ds = await current_dataset(db)
     if ds is None:
         raise HTTPException(404, "Выгрузка ВПЦ ещё не загружена")
-    return ds, await _visible(db, access, ds)
-
-
-async def _visible(
-    db: AsyncSession, access: Access, ds: Dataset,
-) -> list[Row]:
-    codes = await market_codes(db, access.market_ids)
-    rows = an.scope(ds.rows, codes)
-    if access.own_names is None:
-        return rows
-    return [r for r in rows if access.owns(r.bdm, r.analyst)]
+    return view(ds, await scope_of(db, access))
 
 
 def _for_target(rows: list[Row], target: str | None) -> list[Row]:
@@ -120,7 +159,7 @@ async def meta(
     ds = await current_dataset(db)
     if ds is None:
         return {"loaded": False}
-    rows = await _visible(db, access, ds)
+    rows = view(ds, await scope_of(db, access)).rows
     return {
         "loaded": True,
         "import_id": ds.import_id,
@@ -130,21 +169,12 @@ async def meta(
     }
 
 
-@router.get("/offers")
-async def offers(
-    f: an.Filters = Depends(filters_dep),
-    tab: Tab = "all",
-    sort: Sort = "price",
-    desc: bool = False,
-    offset: int = Query(0, ge=0),
-    limit: int = Query(50, ge=1, le=200),
-    access: Access = Depends(_module),
-    db: AsyncSession = Depends(get_db),
+def _offers(
+    v: View, f: an.Filters, tab: str = "all", sort: str = "price",
+    desc: bool = False, offset: int = 0, limit: int = PAGE_SIZE,
 ):
-    ds, rows = await _scoped(db, access)
-
     def build() -> dict:
-        base = an.apply(rows, f)
+        base = an.apply(v.rows, f)
         pct = an.to_min(base, f.price)
         table = an.sort_rows(an.in_tab(base, tab), sort, desc, f.price, pct)
         page = table[offset:offset + limit]
@@ -156,10 +186,33 @@ async def offers(
             "top_mnn": [] if f.mnn else an.mnn_cards(
                 base, f.price, TOP_MNN,
             ),
-            "data_date": ds.data_date.isoformat(),
+            "data_date": v.ds.data_date.isoformat(),
         }
 
-    return await asyncio.to_thread(build)
+    key = v.key("offers", astuple(f), tab, sort, desc, offset, limit)
+    return cached(CACHE, key, build)
+
+
+def _facets(v: View, f: an.Filters):
+    return cached(
+        CACHE, v.key("facets", astuple(f)),
+        lambda: an.facets(v.rows, f),
+    )
+
+
+@router.get("/offers")
+async def offers(
+    f: an.Filters = Depends(filters_dep),
+    tab: Tab = "all",
+    sort: Sort = "price",
+    desc: bool = False,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(PAGE_SIZE, ge=1, le=200),
+    access: Access = Depends(_module),
+    db: AsyncSession = Depends(get_db),
+):
+    v = await _scoped(db, access)
+    return await _offers(v, f, tab, sort, desc, offset, limit)
 
 
 @router.get("/facets")
@@ -168,8 +221,7 @@ async def get_facets(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    _, rows = await _scoped(db, access)
-    return await asyncio.to_thread(an.facets, rows, f)
+    return await _facets(await _scoped(db, access), f)
 
 
 @router.get("/suggest")
@@ -178,7 +230,7 @@ async def suggest(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    _, rows = await _scoped(db, access)
+    rows = (await _scoped(db, access)).rows
     needle = q.strip().casefold()
 
     def build() -> list[dict]:
@@ -268,7 +320,8 @@ async def offer_card(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    ds, rows = await _scoped(db, access)
+    v = await _scoped(db, access)
+    ds, rows = v.ds, v.rows
     target = next((r for r in rows if r.id == offer_id), None)
     offer = await db.get(VpcOffer, offer_id)
     if target is None or offer is None:
@@ -374,7 +427,7 @@ async def export_offers(
 ):
     if not access.can("export:xlsx"):
         raise HTTPException(403, "Нет права на выгрузку в Excel")
-    _, rows = await _scoped(db, access)
+    rows = (await _scoped(db, access)).rows
 
     def build() -> tuple[bytes, int]:
         base = an.apply(rows, f)
@@ -405,26 +458,35 @@ Mode = Literal["target", "maker"]
 FactorySort = Literal["offers", "price", "contracts"]
 
 
+def _factories(
+    v: View, period: str = "all", sort: str = "offers",
+    limit: int = FACTORY_LIMIT, target: str | None = None,
+):
+    def build() -> dict:
+        rows = ins.in_period(
+            _for_target(v.rows, target), period, v.ds.data_date,
+        )
+        return {
+            **ins.factories(rows, v.ds.data_date, sort, limit),
+            "period": period,
+        }
+
+    return cached(
+        CACHE, v.key("factories", period, sort, limit, target), build,
+    )
+
+
 @router.get("/factories")
 async def get_factories(
     period: Period = "all",
     sort: FactorySort = "offers",
-    limit: int = Query(10, ge=1, le=2000),
+    limit: int = Query(10, ge=1, le=FACTORY_LIMIT),
     target: str | None = Query(None, max_length=20),
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    ds, rows = await _scoped(db, access)
-    rows = _for_target(rows, target)
-
-    def build() -> dict:
-        scoped = ins.in_period(rows, period, ds.data_date)
-        return {
-            **ins.factories(scoped, ds.data_date, sort, limit),
-            "period": period,
-        }
-
-    return await asyncio.to_thread(build)
+    v = await _scoped(db, access)
+    return await _factories(v, period, sort, limit, target)
 
 
 @router.get("/factory")
@@ -434,12 +496,22 @@ async def get_factory(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    _, rows = await _scoped(db, access)
-    rows = _for_target(rows, target)
-    profile = await asyncio.to_thread(ins.factory_profile, rows, maker)
-    if profile is None:
-        raise HTTPException(404, "Завод не найден")
-    return profile
+    v = await _scoped(db, access)
+
+    def build() -> dict:
+        profile = ins.factory_profile(_for_target(v.rows, target), maker)
+        if profile is None:
+            raise HTTPException(404, "Завод не найден")
+        return profile
+
+    return await cached(CACHE, v.key("factory", maker, target), build)
+
+
+def _countries(v: View, mode: str = "target", target: str | None = None):
+    return cached(
+        CACHE, v.key("countries", mode, target),
+        lambda: ins.countries(_for_target(v.rows, target), mode),
+    )
 
 
 @router.get("/countries")
@@ -449,9 +521,7 @@ async def get_countries(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    _, rows = await _scoped(db, access)
-    rows = _for_target(rows, target)
-    return await asyncio.to_thread(ins.countries, rows, mode)
+    return await _countries(await _scoped(db, access), mode, target)
 
 
 @router.get("/country")
@@ -462,12 +532,26 @@ async def get_country(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    _, rows = await _scoped(db, access)
-    rows = _for_target(rows, target)
-    detail = await asyncio.to_thread(ins.country_detail, rows, code, mode)
-    if detail is None:
-        raise HTTPException(404, "Страна не найдена")
-    return detail
+    v = await _scoped(db, access)
+
+    def build() -> dict:
+        detail = ins.country_detail(
+            _for_target(v.rows, target), code, mode,
+        )
+        if detail is None:
+            raise HTTPException(404, "Страна не найдена")
+        return detail
+
+    return await cached(CACHE, v.key("country", code, mode, target), build)
+
+
+def _funnel(v: View, period: str = "12", target: str | None = None):
+    def build() -> dict:
+        rows = _for_target(v.rows, target)
+        data = ins.funnel(rows, period, v.ds.data_date)
+        return {**data, "target": target}
+
+    return cached(CACHE, v.key("funnel", period, target), build)
 
 
 @router.get("/funnel")
@@ -477,10 +561,7 @@ async def get_funnel(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    ds, rows = await _scoped(db, access)
-    rows = _for_target(rows, target)
-    data = await asyncio.to_thread(ins.funnel, rows, period, ds.data_date)
-    return {**data, "target": target}
+    return await _funnel(await _scoped(db, access), period, target)
 
 
 @router.get("/summary")
@@ -490,19 +571,47 @@ async def get_summary(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    _, rows = await _scoped(db, access)
+    v = await _scoped(db, access)
 
     def build() -> dict:
-        data = ins.summary(an.in_tab(an.apply(rows, f), tab))
+        data = ins.summary(an.in_tab(an.apply(v.rows, f), tab))
         if f.target:
             data["target_name"] = ins.country_name(f.target, "target")
         return data
 
-    return await asyncio.to_thread(build)
+    return await cached(CACHE, v.key("summary", tab, astuple(f)), build)
 
 
 def _matches(value: str | None, wanted: str | None) -> bool:
     return not wanted or (value or "").casefold() == wanted.casefold()
+
+
+def _overview(
+    v: View, target: str | None = None, responsible: str | None = None,
+    klass: str | None = None, period: str = "all",
+):
+    def build() -> dict:
+        ds = v.ds
+        rows = _for_target(v.rows, target)
+        filters = ins.overview_filters(rows)
+        rows = [
+            r for r in ins.by_period(rows, period, ds.data_date)
+            if _matches(r.responsible, responsible)
+            and _matches(r.klass, klass)
+        ]
+        data = ins.overview(
+            rows, ds.data_date, bool(target),
+            ins.period_end(period, ds.data_date),
+        )
+        return {
+            **data,
+            "filters": filters,
+            "target": target,
+            "data_date": ds.data_date.isoformat(),
+        }
+
+    key = v.key("overview", target, responsible, klass, period)
+    return cached(CACHE, key, build)
 
 
 @router.get("/overview")
@@ -514,21 +623,31 @@ async def get_overview(
     access: Access = Depends(_module),
     db: AsyncSession = Depends(get_db),
 ):
-    ds, rows = await _scoped(db, access)
-    rows = _for_target(rows, target)
-    filters = ins.overview_filters(rows)
-    rows = [
-        r for r in ins.by_period(rows, period, ds.data_date)
-        if _matches(r.responsible, responsible)
-        and _matches(r.klass, klass)
-    ]
-    data = await asyncio.to_thread(
-        ins.overview, rows, ds.data_date, bool(target),
-        ins.period_end(period, ds.data_date),
-    )
-    return {
-        **data,
-        "filters": filters,
-        "target": target,
-        "data_date": ds.data_date.isoformat(),
-    }
+    v = await _scoped(db, access)
+    return await _overview(v, target, responsible, klass, period)
+
+
+def _warm_jobs(v: View, target: str | None) -> Iterator:
+    f = an.Filters(target=target, priced=False, price=an.AGGREGATE_PRICE)
+    yield _overview(v, target)
+    yield _countries(v, "target", target)
+    yield _factories(v, target=target)
+    yield _funnel(v, target=target)
+    yield _offers(v, f)
+    yield _facets(v, f)
+
+
+async def warm(
+    db: AsyncSession, scopes: dict[Scope, tuple[str, ...]],
+) -> int:
+    ds = await current_dataset(db)
+    if ds is None:
+        return 0
+    done = 0
+    for scope, targets in scopes.items():
+        v = view(ds, scope)
+        for target in (None, *targets):
+            for job in _warm_jobs(v, target):
+                await job
+                done += 1
+    return done

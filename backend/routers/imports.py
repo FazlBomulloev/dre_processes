@@ -20,6 +20,7 @@ from backend.database import get_db
 from backend.models import Import, Market
 from backend.schemas import ImportOut
 from backend.services import imports as svc
+from backend.services import prewarm
 from backend.services.access import FORBIDDEN, Access, require, require_any
 from backend.services.audit import record
 from backend.services.rgs.reader import RgsFormatError
@@ -117,6 +118,7 @@ async def upload_vpc(
             ) from exc
         finally:
             tmp.unlink(missing_ok=True)
+    prewarm.refresh()
     await record(
         db, access.user, "vpc_import",
         file=name, rows=imp.rows, import_id=imp.id,
@@ -164,6 +166,7 @@ async def upload_rgs(
             ) from exc
         finally:
             tmp.unlink(missing_ok=True)
+    prewarm.refresh()
     await record(
         db, access.user, "rgs_import", target.id,
         file=name, rows=imp.rows, import_id=imp.id,
@@ -182,6 +185,7 @@ async def set_current(
         raise HTTPException(403, FORBIDDEN)
     if not imp.is_current:
         await svc.make_current(db, imp)
+        prewarm.refresh()
         log.info("Снимок %d (%s) сделан текущим", imp.id, imp.kind)
         await record(
             db, access.user, "import_current", imp.market_id,
@@ -202,6 +206,7 @@ async def delete_import(
     )
     market_id = imp.market_id
     promoted = await svc.remove(db, imp)
+    prewarm.refresh()
     log.info("Удалён снимок %d (%s)", details["import_id"], details["kind"])
     await record(
         db, access.user, "import_delete", market_id,

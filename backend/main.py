@@ -1,5 +1,6 @@
+import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +10,7 @@ from backend.config import CORS_ORIGINS
 from backend.routers import (
     audit, auth, imports, markets, rgs, users, vpc,
 )
+from backend.services import prewarm
 from backend.services.auth import require_user
 
 logging.basicConfig(
@@ -22,7 +24,12 @@ log = logging.getLogger(__name__)
 async def lifespan(_: FastAPI):
     log.info("Запуск EvoDash API")
     await init_db()
+    task = prewarm.schedule()
     yield
+    if task is not None:
+        task.cancel()
+        with suppress(asyncio.CancelledError):
+            await task
     log.info("Остановка EvoDash API")
 
 

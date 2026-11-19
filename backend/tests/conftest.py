@@ -8,6 +8,7 @@ from backend import config, database
 from backend.bootstrap import init_db
 from backend.main import app
 from backend.models import Market, User, UserMarket, UserPermission
+from backend.services import prewarm
 from backend.services.auth import hash_password
 
 PASSWORD = "password1"
@@ -76,6 +77,8 @@ async def env(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "ADMIN_USERNAME", OWNER)
     monkeypatch.setattr(config, "ADMIN_PASSWORD", OWNER_PASSWORD)
     monkeypatch.setattr(config, "UPLOAD_DIR", tmp_path / "uploads")
+    monkeypatch.setattr(config, "PREWARM", False)
+    prewarm.invalidate()
     database.configure(
         f"sqlite+aiosqlite:///{(tmp_path / 'test.db').as_posix()}",
     )

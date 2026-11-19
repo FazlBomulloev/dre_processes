@@ -31,6 +31,7 @@ CORS_ORIGINS = [
 VPC_KK_GROUP = os.getenv("VPC_KK_GROUP", "contract").strip()
 VPC_KEEP_SNAPSHOTS = int(os.getenv("VPC_KEEP_SNAPSHOTS", "12"))
 MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "100"))
+PREWARM = _flag("PREWARM", "1")
 RGS_KEEP_SNAPSHOTS = int(os.getenv("RGS_KEEP_SNAPSHOTS", "12"))
 RGS_RU_MARGIN_MONTHS = int(os.getenv("RGS_RU_MARGIN_MONTHS", "2"))
 RGS_PLAN_DATE = date.fromisoformat(

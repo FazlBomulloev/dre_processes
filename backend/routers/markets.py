@@ -13,6 +13,7 @@ from backend.services.access import (
     market_access,
     require,
 )
+from backend.services import prewarm
 from backend.services.audit import record
 
 log = logging.getLogger(__name__)
@@ -93,6 +94,7 @@ async def update_market(
     for key, value in changes.items():
         setattr(market, key, value)
     await db.commit()
+    prewarm.refresh()
     log.info("Изменён рынок %s: %s", market.code, changes)
     await record(
         db, actor.user, "market_update", market.id,

@@ -14,8 +14,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_db
 from backend.models import Import, Market, RgsItem
-from backend.services.access import Access, market_access, require
+from backend.services.access import (
+    Access, market_access, require, split_names,
+)
 from backend.services.audit import record
+from backend.services.cache import LruCache, cached
 from backend.services.rgs import analytics as an
 from backend.services.rgs.settings import settings
 
@@ -34,6 +37,9 @@ _EXPORT_COLUMNS = (
 )
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
+CACHE = LruCache(max_items=300)
+ITEMS = LruCache(max_items=16)
+
 
 @dataclass
 class Tracker:
@@ -41,7 +47,15 @@ class Tracker:
     imp: Import
     items: list[an.Item]
     settings: an.Settings
-    access: Access
+    own: tuple[str, ...] | None
+    access: Access | None = None
+
+    def key(self, *parts) -> tuple:
+        return (
+            self.market.id, self.imp.id, self.imp.uploaded_at,
+            self.market.settings_json, self.settings.today, self.own,
+            *parts,
+        )
 
 
 def _item(row: RgsItem) -> an.Item:
@@ -61,28 +75,91 @@ async def _current(db: AsyncSession, market: Market) -> Import | None:
     )).scalar_one_or_none()
 
 
+async def _items(db: AsyncSession, imp: Import) -> list[an.Item]:
+    key = (imp.id, imp.uploaded_at)
+    items = ITEMS.get(key)
+    if items is None:
+        rows = (await db.execute(
+            select(RgsItem).where(RgsItem.import_id == imp.id)
+            .order_by(RgsItem.id)
+        )).scalars().all()
+        items = [_item(r) for r in rows]
+        ITEMS.set(key, items)
+    return items
+
+
+def own_of(access: Access) -> tuple[str, ...] | None:
+    names = access.own_names
+    return None if names is None else tuple(sorted(names))
+
+
+async def load(
+    db: AsyncSession, market: Market, own: tuple[str, ...] | None,
+) -> Tracker | None:
+    imp = await _current(db, market)
+    if imp is None:
+        return None
+    items = await _items(db, imp)
+    if own is not None:
+        names = frozenset(own)
+        items = [i for i in items if split_names(i.owner) & names]
+    today = imp.data_date or date.today()
+    return Tracker(market, imp, items, settings(market, today), own)
+
+
 async def tracker(
     access: Access = Depends(_module),
     market: Market = Depends(market_access),
     db: AsyncSession = Depends(get_db),
 ) -> Tracker:
-    imp = await _current(db, market)
-    if imp is None:
+    t = await load(db, market, own_of(access))
+    if t is None:
         raise HTTPException(
             404, f"Трекер RGS для рынка {market.code} ещё не загружен",
         )
-    rows = (await db.execute(
-        select(RgsItem).where(RgsItem.import_id == imp.id)
-        .order_by(RgsItem.id)
-    )).scalars().all()
-    today = imp.data_date or date.today()
-    return Tracker(
-        market=market,
-        imp=imp,
-        items=[_item(r) for r in rows if access.owns(r.owner)],
-        settings=settings(market, today),
-        access=access,
+    t.access = access
+    return t
+
+
+def _overview(t: Tracker, cat: str | None = None):
+    return cached(
+        CACHE, t.key("overview", cat),
+        lambda: an.overview(t.items, t.settings, cat),
     )
+
+
+def _stops(t: Tracker, cat: str | None = None):
+    return cached(
+        CACHE, t.key("stops", cat), lambda: an.stops(t.items, cat),
+    )
+
+
+def _products(
+    t: Tracker, stage: str | None = None, q: str | None = None,
+    cat: str | None = None,
+):
+    return cached(
+        CACHE, t.key("products", stage, q, cat),
+        lambda: an.products(t.items, t.settings, stage, q, cat),
+    )
+
+
+async def warm(
+    db: AsyncSession, owns: set[tuple[str, ...] | None],
+) -> int:
+    markets = (await db.execute(
+        select(Market).order_by(Market.code)
+    )).scalars().all()
+    done = 0
+    for market in markets:
+        for own in owns:
+            t = await load(db, market, own)
+            if t is None:
+                break
+            for job in (_overview(t), _products(t), _stops(t)):
+                await job
+                done += 1
+    return done
 
 
 @router.get("/meta")
@@ -110,7 +187,7 @@ async def overview(
     cat: str | None = Query(None, pattern=_CAT),
     t: Tracker = Depends(tracker),
 ):
-    return an.overview(t.items, t.settings, cat)
+    return await _overview(t, cat)
 
 
 @router.get("/months/{month}")
@@ -119,7 +196,10 @@ async def month(
     cat: str | None = Query(None, pattern=_CAT),
     t: Tracker = Depends(tracker),
 ):
-    return an.month(t.items, t.settings, month, cat)
+    return await cached(
+        CACHE, t.key("month", month, cat),
+        lambda: an.month(t.items, t.settings, month, cat),
+    )
 
 
 @router.get("/stops")
@@ -127,7 +207,7 @@ async def stops(
     cat: str | None = Query(None, pattern=_CAT),
     t: Tracker = Depends(tracker),
 ):
-    return an.stops(t.items, cat)
+    return await _stops(t, cat)
 
 
 @router.get("/products")
@@ -137,7 +217,7 @@ async def products(
     cat: str | None = Query(None, pattern=_CAT),
     t: Tracker = Depends(tracker),
 ):
-    return an.products(t.items, t.settings, stage, q, cat)
+    return await _products(t, stage, q, cat)
 
 
 def _export_book(items: list[an.Item], s: an.Settings) -> bytes:
