@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Препараты</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f4f1}
+a{color:#2f56a8}a:hover{color:#203f80}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="min-height: 1700px; background: #f4f4f1; font-family: 'Onest', system-ui, sans-serif; color: #16181d; font-variant-numeric: tabular-nums;">
+<div style="max-width: 1180px; margin: 0 auto; padding: 24px 28px 64px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px;">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; background: #1f2a4d; color: #c8f04b; font-weight: 700; font-size: 13px; letter-spacing: 0.02em;">RGS</span>
+      <span style="display: flex; flex-direction: column; line-height: 1.3;">
+        <span style="font-size: 15px; font-weight: 600;">Регистрация · Азербайджан</span>
+        <span style="font-size: 12px; color: #6b6f78;">Данные трекера на 13.11.2026</span>
+      </span>
+    </div>
+    <nav aria-label="Разделы" style="display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #ffffff;">
+      <a href="Main.dc.html" style="padding: 9px 18px; border-radius: 999px; color: #5d616a; font-size: 13px; text-decoration: none;">Обзор</a>
+      <a href="Products.dc.html" aria-current="page" style="padding: 9px 18px; border-radius: 999px; background: #16181d; color: #ffffff; font-size: 13px; font-weight: 500; text-decoration: none;">Препараты</a>
+    </nav>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px;">
+    <h1 style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -0.025em;">Препараты</h1>
+    <label style="display: flex; align-items: center; gap: 8px; height: 42px; width: 300px; max-width: 100%; border-radius: 999px; background: #ffffff; padding: 0 16px; box-sizing: border-box;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b6f78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input id="search" aria-label="Найти препарат, МНН или завод" placeholder="Препарат, МНН или завод" value="{{q}}" onChange="{{onSearch}}" style="border: 0; outline: none; flex: 1; min-width: 0; font-family: inherit; font-size: 14px; background: transparent;">
+    </label>
+  </div>
+
+  <div role="group" aria-label="Этап" style="display: flex; flex-wrap: wrap; gap: 6px;">
+    <sc-for list="{{tabs}}" as="b" hint-placeholder-count="6">
+      <button type="button" aria-pressed="{{b.on}}" onClick="{{b.pick}}" style="display: flex; align-items: center; gap: 8px; border: 0; background: {{b.bg}}; color: {{b.fg}}; border-radius: 999px; padding: 8px 8px 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer;">{{b.label}} <span style="border-radius: 99px; background: {{b.cntBg}}; padding: 1px 9px; font-size: 12px; font-weight: 600;">{{b.n}}</span></button>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start;">
+    <section style="flex: 999 1 560px; min-width: 0; border-radius: 24px; background: #ffffff; padding: 8px 20px 16px;">
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px;">
+          <thead>
+            <tr style="text-align: left; color: #6b6f78; font-size: 12px;">
+              <th style="padding: 12px 8px; font-weight: 500;">Препарат</th>
+              <th style="padding: 12px 8px; font-weight: 500;">Этап</th>
+              <th style="padding: 12px 8px; font-weight: 500;">Подано</th>
+              <th style="padding: 12px 8px; font-weight: 500;">План РУ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="16">
+              <tr style="border-top: 1px solid #f1f1ee; background: {{r.rowBg}};">
+                <td style="padding: 6px 8px;">
+                  <button type="button" onClick="{{r.pick}}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border: 0; background: transparent; padding: 6px 0; cursor: pointer; text-align: left; color: #16181d;">
+                    <span style="font-size: 14px; font-weight: 600;">{{r.n}}</span>
+                    <span style="font-size: 12px; color: #3d4048;">{{r.spec}}</span>
+                    <span style="font-size: 12px; color: #6b6f78;">{{r.mfg}} · {{r.cat}}</span>
+                  </button>
+                </td>
+                <td style="padding: 6px 8px;"><span style="display: inline-flex; border-radius: 999px; padding: 4px 11px; font-size: 12px; font-weight: 500; background: {{r.stBg}}; color: {{r.stFg}}; white-space: nowrap;">{{r.stage}}</span></td>
+                <td style="padding: 6px 8px; white-space: nowrap; color: {{r.pdColor}};">{{r.pd}}</td>
+                <td style="padding: 6px 8px; white-space: nowrap; color: {{r.ruColor}};">{{r.ru}}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{false}}">
+        <p style="margin: 0; padding: 32px 8px; font-size: 14px; color: #6b6f78; text-align: center;">Ничего не найдено. Измените поиск или этап.</p>
+      </sc-if>
+    </section>
+
+    <aside style="flex: 1 1 340px; min-width: 0; border-radius: 24px; background: #1f2a4d; color: #ffffff; padding: 26px 26px 28px; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <span style="font-size: 12px; color: #c3cbe6;">{{sel.meta}}</span>
+        <span style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">{{sel.n}}</span>
+        <span style="font-size: 13px; color: #c3cbe6;">{{sel.ru}}</span>
+        <span style="font-size: 13px; color: #ffffff;">{{sel.spec}}</span>
+        <span style="font-size: 12px; color: #8f9ac0;">{{sel.gen}}</span>
+      </div>
+      <span style="align-self: flex-start; border-radius: 999px; padding: 6px 12px; background: rgba(200, 240, 75, 0.16); color: #d9f58a; font-size: 12px; font-weight: 600;">{{sel.stage}}</span>
+      <sc-if value="{{sel.hasPlan}}" hint-placeholder-val="{{true}}">
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+          <span style="border-radius: 14px; background: rgba(255,255,255,0.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 11px; color: #c3cbe6;">План подачи</span><span style="font-size: 15px; font-weight: 600;">{{sel.mpl}}</span></span>
+          <span style="border-radius: 14px; background: rgba(255,255,255,0.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 11px; color: #c3cbe6;">Факт</span><span style="font-size: 15px; font-weight: 600;">{{sel.pd}}</span></span>
+          <span style="border-radius: 14px; background: rgba(255,255,255,0.07); padding: 10px 12px; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 11px; color: #c3cbe6;">Сдвиг</span><span style="font-size: 15px; font-weight: 600; color: {{sel.shiftColor}};">{{sel.shift}}</span></span>
+        </div>
+      </sc-if>
+      <div style="display: flex; flex-direction: column;">
+        <sc-for list="{{sel.steps}}" as="s" hint-placeholder-count="9">
+          <div style="display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid rgba(255,255,255,0.08);">
+            <span style="width: 8px; height: 8px; border-radius: 99px; background: {{s.dot}};"></span>
+            <span style="font-size: 13px; color: {{s.color}};">{{s.label}}</span>
+            <span style="font-size: 13px; font-weight: 600; color: {{s.color}};">{{s.d}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 12px; color: #c3cbe6;">Документы · {{sel.docN}} из 7</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <sc-for list="{{sel.docs}}" as="d" hint-placeholder-count="7">
+            <span style="border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 500; background: {{d.bg}}; color: {{d.fg}};">{{d.t}}</span>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{sel.hasCm}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; flex-direction: column; gap: 6px; border-radius: 14px; background: rgba(255,255,255,0.07); padding: 12px 14px;">
+          <span style="font-size: 12px; color: #c3cbe6;">Комментарий ответственного</span>
+          <span style="font-size: 13px; line-height: 1.45;">{{sel.cm}}</span>
+        </div>
+      </sc-if>
+    </aside>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+const D = [
+["DEXAPAIN", "25 MG / ML", "ДЕКСАПЕЙН", "DEXKETOPROFEN", "SOLUTION", "M", "ЧС", "BALKAN/DISTRIMED", "dhp2", "sub", 0, "25-02-24", "25-03-04", "25-03-15", "25-08-25", "", "26-11-29", "25-10-01", "25-10-16", "25-12-22", "26-01-05", "1111111", "13.03.2025: Dossier is received. Waiting for CPP."],
+["DONEZIL", "5 MG", "ДОНЕЗИЛ", "DONEPEZIL", "TABLETS", "M", "ЧС", "NOVELL PHARM", "dhp2", "sub", 0, "25-03-14", "25-03-17", "25-08-02", "25-11-19", "", "27-02-24", "25-12-11", "25-12-19", "26-05-12", "26-06-09", "1111111", "08.05.2025 received. Applied for CPP"],
+["GESTERIOL", "10 MG", "ГЕСТЕРИОЛ", "DYDROGESTERONE", "TABLETS", "M", "ЧС", "RENATA", "dhp2", "sub", 0, "25-03-14", "25-03-14", "25-04-25", "25-12-17", "", "27-03-21", "26-01-15", "26-01-22", "26-03-13", "26-03-27", "1111111", "Partly received on 19.05.2025"],
+["FINOTERB", "250 MG", "ФИНОТЕРБ", "TERBINAFINE", "TABLETS", "M", "ЧС", "RENATA", "dhp2", "sub", 0, "25-03-14", "25-03-14", "25-05-20", "25-12-17", "", "27-03-21", "26-01-15", "26-01-22", "26-06-02", "26-06-09", "1111111", "We will share by End of May."],
+["EDINAZID", "100 MG", "ЭДИНАЗИД", "REBAMIPIDE", "TABLETS", "M", "ЧС", "NOVELL PHARM", "dhp2", "sub", 0, "25-03-14", "25-03-17", "25-10-20", "25-12-23", "", "27-03-27", "26-01-15", "26-01-22", "26-06-02", "26-06-09", "1111111", ""],
+["ROXIVEN", "20 MG", "РОКСИВЕН", "RIVAROXABAN", "TABLETS", "M", "ЧС", "RENATA", "dhp2", "sub", 0, "25-03-14", "25-03-14", "25-04-20", "26-01-29", "", "27-05-05", "26-03-04", "26-03-27", "26-07-01", "26-07-20", "1111111", "Received on 19.05.2025"],
+["ROXIVEN", "10 MG", "РОКСИВЕН", "RIVAROXABAN", "TABLETS", "M", "ЧС", "RENATA", "dhp2", "sub", 0, "25-03-14", "25-03-14", "25-04-20", "26-01-29", "", "27-05-05", "26-03-04", "26-03-27", "26-07-01", "26-07-20", "1111111", "Received on 19.05.2025"],
+["LACTERIA", "40 MG", "ЛАКТЕРИА", "LACTIC ACID", "SUPP", "MD", "ЧС", "CPC 1HN", "dhp", "sub", 0, "25-05-01", "25-05-02", "25-10-01", "26-02-26", "", "27-06-02", "", "", "", "", "1111111", ""],
+["BERRYLACT EXTRA", "2000 + 200 + 70 MG", "БЕРРИЛАКТ ЭКСТРА", "D-MANNOSE + CRANBERRY EXTRACT", "SACHET", "FS", "ЧС", "KENDY", "dhp1", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "30.01.2025: Sample will be ready on April. Dossier is ready."],
+["LACTOSPEY DROPS", "100 MLN CFU", "ЛАКТОСПЕЙ ДРОПС", "LACTOBACILLUS REUTERI", "ORAL DRP", "FS", "ЧС", "OFI S.P.A.", "dhp1", "sub", 0, "24-12-26", "25-01-13", "25-01-31", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "20.05.2025: Samples will be ready by the end of month."],
+["LACTOSPEY DRINK", "10 ML", "ЛАКТОСПЕЙ ДРИНК", "VIT B6 + B2 + B1 + B12 + PP + …", "ORAL SOL", "FS", "ЧС", "OFI S.P.A.", "dhp1", "sub", 0, "24-12-26", "25-01-13", "25-01-31", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "20.05.2025: Samples will be ready by the end of month."],
+["OSTEOSTRONG", "500 + 5 + 1 MG", "ОСТЕОСТРОНГ", "CALCIUM + VIT D3 + …", "TABLETS", "FS", "ЧС", "OLIMP LABORATORIES", "dhp1", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "30.01.2025: Waiting for sample. Dossier is ready."],
+["FERTIVITA", "6150 + 10 + 600 MG", "ФЕРТИВИТА", "L-ARGININE-A-KETOGLUTARATE + COENZYME Q10 + …", "SACHET", "FS", "ЧС", "OLIMP LABORATORIES", "dhp1", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "30.01.2025: Waiting for TJ order to be ready for sample. Dossier is ready"],
+["FERTILIFE", "6150 + 900 + 100 MG", "ФЕРТИЛАЙФ", "L-ARGININE-A-KETOGLUTARATE + L-CARNITINE + …", "SACHET", "FS", "ЧС", "OLIMP LABORATORIES", "dhp1", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "30.01.2025: Dossier is ready. Samples are with plant."],
+["MAGNISPEY", "100 + 2.1 MG", "МАГНИСПЕЙ", "MAGNESIUM + VITAMIN B6", "CAPSULES", "FS", "ЧС", "OLIMP LABORATORIES", "dhp1", "sub", 0, "24-05-22", "24-05-30", "24-06-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "30.01.2025: Dossier is ready. Waiting for the sample."],
+["PYLOSPEY", "200 + 75 MG", "ПИЛОСПЕЙ", "POLYPASS + BROCCOPHANE", "CAPSULES", "FS", "ЧС", "PHARMALINEA", "dhp1", "sub", 0, "24-12-26", "25-01-13", "25-01-16", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "1111111", "30.01.2025: Dossier is ready. Samples were dispatched. Applied for FSC."],
+["LACTOSPEY ENTERIC ECOL", "250 + 125 + 25 MG", "ЛАКТОСПЕЙ ЭНТЕРИК ЭКОЛ", "SACCHAROMYCES BOULARDII + пробиотики", "CAPSULES", "FS", "IZ", "KENDY", "dha", "sub", 0, "25-09-19", "25-10-03", "26-01-16", "26-05-13", "26-05-30", "27-02-26", "", "", "", "", "1111101", "Подано"],
+["APITROKSAR", "5 MG", "АПИТРОКСАР", "APIXABAN", "TC-TAB FC", "M", "ЧС", "RENATA", "dhp2", "sub", 0, "25-03-14", "25-03-14", "25-04-04", "26-06-04", "26-05-30", "27-09-04", "26-06-19", "26-07-20", "26-07-29", "26-08-14", "1111111", "Partly received on 19.05.2025"],
+["REGIMED", "50 + 50 + 0.5 MG/ML", "РЕГИМЕД", "THIAMINE + PYRIDOXINE + CYANOCOBALAMIN", "INJ", "M", "ЧС", "BALKAN/DISTRIMED", "dhp2", "sub", 0, "25-02-24", "25-03-04", "", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "1111111", "13.03.2025: регистрация в Молдове истекла в 2023, ждали новую."],
+["KORTIPAN", "5 + 2 MG/ML", "КОРТИПАН", "BETAMETHASONE", "AMPOULES", "M", "ЧС", "BALKAN/DISTRIMED", "dhp2", "sub", 0, "25-02-24", "25-03-04", "", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "1111111", "13.03.2025: регистрация в Молдове истекла в 2023, ждали новую."],
+["ESCILEKT", "20 MG", "ЭСЦИЛЕКТ", "ESCITALOPRAM", "TABLETS", "M", "ЧС", "NOVELL PHARM", "dhp2", "sub", 0, "25-03-14", "25-03-17", "25-11-28", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "1111111", ""],
+["ESCILEKT", "10 MG", "ЭСЦИЛЕКТ", "ESCITALOPRAM", "TABLETS", "M", "ЧС", "NOVELL PHARM", "dhp2", "sub", 0, "25-03-14", "25-03-17", "25-11-28", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "1111111", ""],
+["FERZAPIN", "5 MG", "ФЕРЗАПИН", "OLANZAPINE", "TABLETS", "M", "IZ", "WHANIN PHARMA", "dhp2", "sub", 0, "25-11-21", "25-11-24", "26-01-09", "26-06-17", "26-06-10", "27-09-15", "26-06-29", "26-07-13", "26-08-28", "26-09-11", "1111111", "Подано"],
+["FERZAPIN", "10 MG", "ФЕРЗАПИН", "OLANZAPINE", "TABLETS", "M", "IZ", "WHANIN PHARMA", "dhp2", "sub", 0, "25-11-21", "25-11-24", "26-01-09", "26-06-17", "26-06-10", "27-09-15", "26-06-29", "26-07-13", "26-08-28", "26-09-11", "1111111", "Подано"],
+["PANTOSPEY", "40 MG", "ПАНТОСПЕЙ", "PANTOPRAZOLE", "I-LYOPH", "M", "IZ", "BALKAN/DISTRIMED", "dhp1", "sub", 0, "25-11-21", "25-11-24", "26-01-08", "26-06-29", "26-06-10", "27-09-15", "26-07-15", "26-08-03", "", "", "1111111", "Подано"],
+["LOXICAM", "8 MG / 2 ML", "ЛОКСИКАМ", "LORNOXICAM", "I-AMP", "M", "IZ", "BALKAN/DISTRIMED", "dhp1", "sub", 0, "26-01-07", "26-01-08", "26-01-29", "26-06-30", "26-06-10", "27-09-15", "26-07-15", "26-08-03", "26-09-30", "26-10-08", "1111111", "Подано"],
+["VEGANEPHRON", "100 ML", "ВЕГАНЕФРОН", "LESPEDEZA CAPITATE EXTRACT + STAR ANISE", "SYR", "FS", "IZ", "FORTEX", "dha", "sub", 0, "26-02-25", "26-02-26", "26-06-02", "26-07-10", "26-08-10", "27-05-08", "", "", "", "", "1111101", "Подано"],
+["MAGNISPEY BABY", "29.8 MG / 5 ML", "МАГНИСПЕЙ БЕБИ", "MAGNESIUM + VITAMIN B6", "SYR", "FS", "IZ", "FORTEX", "dha", "sub", 0, "26-02-25", "26-02-26", "26-06-02", "26-07-10", "26-08-10", "27-05-08", "", "", "", "", "1111101", "Подано"],
+["NEUROCRIN", "5 MG / ML", "НЕЙРОКРИН", "IPIDACRINE", "INJ", "M", "IZ", "BALKAN/DISTRIMED", "dhp1", "sub", 0, "25-11-21", "25-11-24", "26-01-08", "26-07-13", "26-06-10", "27-09-15", "26-07-24", "26-08-14", "26-09-30", "26-10-08", "1111111", "Подано"],
+["NEUROCRIN", "15 MG / ML", "НЕЙРОКРИН", "IPIDACRINE", "INJ", "M", "IZ", "BALKAN/DISTRIMED", "dhp1", "sub", 0, "25-11-21", "25-11-24", "26-01-08", "26-07-13", "26-06-10", "27-09-15", "26-07-24", "26-08-14", "26-09-30", "26-10-08", "1111111", "Подано"],
+["ERTOFINAN", "60 MG", "ЭРТОФИНАН", "ETORICOXIB", "TC-TAB FC", "M", "IZ", "ESKAYEF", "dhp1", "sub", 0, "26-01-07", "26-01-26", "26-03-06", "26-08-14", "26-07-10", "27-10-14", "26-09-02", "26-09-11", "26-10-30", "26-11-04", "1111111", "Подано"],
+["ERTOFINAN", "90 MG", "ЭРТОФИНАН", "ETORICOXIB", "TC-TAB FC", "M", "IZ", "ESKAYEF", "dhp1", "sub", 0, "26-01-07", "26-01-26", "26-03-06", "26-08-14", "26-07-10", "27-10-14", "26-09-02", "26-09-11", "26-10-30", "26-11-04", "1111111", "Подано"],
+["ERTOFINAN", "120 MG", "ЭРТОФИНАН", "ETORICOXIB", "TC-TAB FC", "M", "IZ", "ESKAYEF", "dhp1", "sub", 0, "26-01-07", "26-01-26", "26-03-06", "26-08-14", "26-07-10", "27-10-14", "26-09-02", "26-09-11", "26-10-30", "26-11-04", "1111111", "Подано"],
+["APITROKSAR", "2.5 MG", "АПИТРОКСАР", "APIXABAN", "TC-TAB FC", "M", "ЧС", "RENATA", "dhp1", "sub", 0, "25-03-14", "25-03-14", "25-04-04", "26-08-25", "", "", "26-09-09", "26-09-11", "", "", "1111111", "Partly received on 19.05.2025"],
+["LEVOSPEY", "500 MG / 100 ML", "ЛЕВОСПЕЙ", "LEVOFLOXACIN", "I-INF", "M", "IZ", "NABIQASIM", "dha", "p09", 0, "26-01-07", "26-01-08", "", "26-10-13", "26-07-10", "27-10-14", "26-10-29", "26-11-04", "", "", "1111111", "Подано"],
+["VIPLACTIN OPTI", "300 + 300 + 50 MG", "ВИПЛАКТИН ОПТИ", "LACTOBACILLI + BIFIDOBACTERIA + FOS", "TC-CAP", "FS", "IZ", "KENDY", "dha", "p09", 0, "26-05-19", "26-05-20", "", "26-11-02", "", "", "", "", "", "", "1111101", "Подано"],
+["SETIMED", "5 MG", "СЕТИМЕД", "LEVOCETIRIZINE", "TC-TAB FC", "M", "IZ", "STELLA PHARMA", "dha", "p09", 0, "26-01-07", "26-01-08", "26-01-14", "26-11-05", "26-06-10", "27-09-15", "", "", "", "", "1111101", "Подано"],
+["VEGACEF", "1000 MG", "ВЕГАЦЕФ", "CEFTRIAXONE", "I-VIAL", "M", "IZ", "NABIQASIM", "dha", "p09", 0, "26-01-07", "26-01-08", "26-02-12", "26-11-05", "26-07-10", "27-10-14", "", "", "", "", "1000000", "Подано"],
+["ZHASMED", "500 MG", "ЖАСМЕД", "AZITHROMYCIN", "TABLETS", "M", "ЧС", "RENATA", "dct", "risk", 0, "25-03-14", "25-03-14", "25-05-15", "", "26-05-30", "27-09-04", "", "", "", "", "1110011", "Завод обещал передать документы до конца июня 2025."],
+["ERGONEX", "0.5 MG", "ЭРГОНЕКС", "CABERGOLINE", "TABLETS", "M", "IZ", "RENATA", "dcb", "risk", 0, "25-09-19", "25-09-25", "26-01-15", "", "26-07-10", "27-10-14", "", "", "", "", "1000000", "Ожидаем РСО и админдоки."],
+["ITOGAST", "50 MG", "ИТОГАСТ", "ITOPRIDE", "TABLETS", "M", "IZ", "VELPHARM", "dca", "long", 0, "25-09-19", "25-09-25", "26-01-30", "", "26-07-10", "27-10-14", "", "", "", "", "1110000", "Завод обновляет досье. Досье будет готово к концу 2026 года."],
+["VEGADERM", "крем", "ВЕГАДЕРМ", "BETAMETHASONE + CLOTRIMAZOLE + GENTAMICIN", "CREAM", "M", "IZ", "STELLA PHARMA", "dca", "long", 0, "26-01-07", "26-01-08", "26-02-25", "", "26-08-10", "27-11-14", "", "", "", "", "1000000", "Досье требует доработки. Досье будет готово в апреле 2027."],
+["FOBOS", "150 MG", "ФОБОС", "FLUCONAZOLE", "CAPSULES", "M", "IZ", "STELLA PHARMA", "dca", "long", 0, "26-01-07", "26-01-08", "26-03-17", "", "26-08-10", "27-11-14", "", "", "", "", "1000000", "Досье требует доработки. Досье будет готово в апреле 2027."],
+["FINOTERB", "крем 1%", "ФИНОТЕРБ", "TERBINAFINE", "CREAM", "M", "IZ", "STELLA PHARMA", "dca", "long", 0, "26-01-07", "26-01-08", "26-02-25", "", "26-08-10", "27-11-14", "", "", "", "", "1000000", "Досье требует доработки. Досье будет готово в апреле 2027."],
+["PERMANEO DUAL", "капсулы", "ПЕРМАНЕО ДУАЛ", "MAGNESIUM + ZINC + PANTOTHENIC ACID + …", "CAPSULES", "FS", "IZ", "FORTEX", "dh", "p09", 0, "26-03-02", "26-03-02", "26-06-02", "", "26-08-10", "27-05-08", "", "", "", "", "1111000", "В связи с изменением законодательства теперь требуются референс-стандарты."],
+["MYOMEX", "капсулы", "МИОМЕКС", "EPIGALLOCATECHIN 3-GALLATE + …", "CAPSULES", "FS", "IZ", "FORTEX", "dh", "p09", 0, "26-02-25", "26-02-26", "26-06-02", "", "26-08-10", "27-05-08", "", "", "", "", "1111000", "Подадим до конца ноября 2026."],
+["IMMUJEN", "капсулы", "ИММУЖЕН", "GINSENG + VIT A + COLECALCIFEROL + …", "CAPSULES", "FS", "IZ", "FORTEX", "dca", "risk", 0, "26-02-25", "26-02-26", "26-06-02", "", "26-08-10", "27-05-08", "", "", "", "", "1111100", "Нет методики идентификации Вит В4 и Вит В12. Просим снять с работы."],
+["LACTOSPEY KIDS", "саше", "ЛАКТОСПЕЙ КИДС", "SACCHAROMYCES BOULARDII + L. RHAMNOSUS", "SACHET", "FS", "IZ", "KENDY", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "0000000", "Стоп: продукт не зарегистрирован в стране производителя."],
+["SELTOZIDIM", "1 G", "СЕЛТОЗИДИМ", "CEFTAZIDIME", "I-INJ", "M", "IZ", "ACS DOBFAR", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "0000000", "Продукт остановлен, подавать в Азербайджане не будем."],
+["BERRYLACT KIDS", "сироп", "БЕРРИЛАКТ КИДС", "CRANBERRY + COMBI", "SYRUP", "FS", "IZ", "BIOFAKTOR", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "0000000", "Стоп: продукт не зарегистрирован в стране производителя."],
+["KEDD", "100 + 100 MG", "КЕДД", "CLINDAMYCIN + CLOTRIMAZOLE", "SUPP", "MD", "ЧС", "CPC 1HN", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["VOLKRON", "5 MG", "ВОЛКРОН", "TADALAFIL", "TABLETS", "M", "IZ", "DONGKOO BIOPHARMA", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "1000000", "Стоп: неполное досье."],
+["VOLKRON", "20 MG", "ВОЛКРОН", "TADALAFIL", "TABLETS", "M", "IZ", "DONGKOO BIOPHARMA", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "1000000", "Стоп: неполное досье."],
+["LINDAFER", "100 MG / 5 ML", "ЛИНДАФЕР", "FERRIC SUCROSE COMPLEX", "I-AMP", "M", "IZ", "NABIQASIM", "sdca", "stop", 0, "", "", "", "", "", "", "", "", "", "", "0000000", "Стоп: БДМ не смог согласовать цену."],
+["LILAIZ ROSE DOUCHE", "100 ML", "ЛИЛАЙЗ РОЗА ДУШ", "MAGALDRATE + SODIUM HYALURONATE + ALOE VERA", "VG-SOL", "MD", "IZ", "BIODUE", "dca", "p10", 0, "26-05-26", "26-06-10", "26-06-11", "", "", "", "", "", "", "", "0000000", "Подадим до конца ноября 2026."],
+["GINELIFE-L", "750 + 200 + 100 MG", "ГИНЕЛАЙФ-Л", "METRONIDAZOLE + MICONAZOLE + LIDOCAINE", "VAGINAL TABLETS", "M", "IZ", "DROGSAN", "d", "p11", 0, "26-07-07", "26-07-07", "26-10-06", "", "", "", "", "", "", "", "0000000", "Ждём админдоки, образцы и РСО."],
+["CYCLONORM ALFA", "550 + 0.24 MG", "ЦИКЛОНОРМ АЛЬФА", "MYO-INOSITOL + SOYBEAN OIL + FOLIC ACID", "CAPSULES", "FS", "IZ", "LOLI PHARMA", "dc", "p11", 0, "26-05-26", "26-06-12", "", "", "", "", "", "", "", "", "0000000", "Ждём админдоки."],
+["NUTRISPEY", "ампулы", "НУТРИСПЕЙ", "YEAST EXTRACT + L-ARGININE + LYSINE", "ORAL AMP", "FS", "IZ", "MARTINEZ", "d", "new", 0, "26-10-06", "26-10-12", "", "", "", "", "", "", "", "", "0000000", "Ждём досье."],
+["FERROSPEY", "100 MG / 5 ML", "ФЕРРОСПЕЙ", "FERRIC SUCROSE COMPLEX", "I-AMP", "M", "IZ", "PHARMADA", "d", "new", 0, "26-10-28", "26-11-04", "", "", "", "", "", "", "", "", "0000000", ""],
+["DICARD FDP", "5 G", "ДИКАРД ФДП", "FRUCTOSE DIPHOSPHATE", "POW. FOR INJ.", "M", "IZ", "SINOLEAD", "d", "new", 0, "26-10-28", "26-11-06", "", "", "", "", "", "", "", "", "0000000", ""],
+["HONDROSPEY", "таблетки", "ХОНДРОСПЕЙ", "GLUCOSAMINE + MSM + CHONDROITIN", "TABS", "FS", "IZ", "FORTEX", "", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["FOLENS META", "капли", "ФОЛЕНС МЕТА", "VITAMIN B12 + FOLIC ACID", "ORAL DROP", "FS", "IZ", "FORTEX", "", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["DICHOLEK", "15000 IU/ML", "ДИХОЛЕК", "VITAMIN D3", "DROPS", "FS", "IZ", "FORTEX", "", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["RELASON KIDS", "сироп", "РЕЛАСОН КИДС", "LINDEN FLOWERS + …", "SYR", "FS", "IZ", "FORTEX", "", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["SELTOZIDIM", "1000 MG", "СЕЛТОЗИДИМ", "CEFTAZIDIME", "INJ", "M", "", "SKMP", "dc", "new", 1, "", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["MEMIBEL-L", "750 + 200 MG + 100 MLN", "МЕМИБЕЛ-Л", "METRONIDAZOLE + MICONAZOLE + LIDOCAINE", "VG-SUPP", "M", "", "BLIS", "dc", "new", 1, "", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["METROVENS GINO", "500 MG + 65 000 + 100 000 IU", "МЕТРОВЕНС ГИНО", "METRONIDAZOLE + NEOMYCIN + NYSTATIN", "VG-SUPP", "M", "", "BLIS", "dc", "new", 1, "", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["FOBOS", "200 MG / 100 ML", "ФОБОС", "FLUCONAZOLE", "I-INF", "M", "", "OTSUKA", "dc", "new", 1, "", "", "", "", "", "", "", "", "", "", "0000000", ""],
+["ZOLEOST", "4 MG / 100 ML", "ЗОЛЕОСТ", "ZOLEDRONIC ACID", "I-INF", "M", "", "OTSUKA", "dc", "new", 1, "", "", "", "", "", "", "", "", "", "", "0000000", ""]
+];
+const SPEC = ["SOLUTION · 25 MG / ML · уп. 5 * 2 ML", "TABLETS · 5 MG · уп. 30", "TABLETS · 10 MG · уп. 2 X 10", "TABLETS · 250 MG · уп. 14", "TABLETS · 100 mg · уп. 30", "TABLETS · 20 MG · уп. 28", "TABLETS · 10 MG · уп. 3 X 10", "SUPP · 40 MG · уп. 7", "SACHET · 2000 MG + 200 MG + 70 MG + 3.4 MG · уп. 14", "ORAL DRP · 108 CFU (100 MLN) 0.005 G · уп. 10 ML", "ORAL SOL · 0.6 MG + 0.48 MG + 0.42 MG + 2 M … · уп. 10", "TABLETS · 500 MG + 5 MG + 1 MG + 5 UQ + 37 … · уп. 60", "SACHET · 6150 MG + 10 MG + 600 MG + 60 MG … · уп. 15", "SACHET · 6150 MG + 900 MG + 100 MG + 1 MG … · уп. 15", "CAPSULES · 100 MG + 2.1 MG · уп. 30", "CAPSULES · 200 MG + 75 MG · уп. 30", "CAPSULES · 250.0 MG + 125.0 MG + 25.0 MG · уп. 10", "TC-TAB FC · 5 MG · уп. 30", "INJ · 50 MG + 50 MG + 0.5 MG / ML · уп. 5 * 2 ML", "AMPOULES · 5 MG + 2 MG / 1 ML · уп. 1", "TABLETS · 20 MG · уп. 30", "TABLETS · 10 MG · уп. 30", "TABLETS · 5 MG · уп. 28", "TABLETS · 10 MG · уп. 28", "I-LYOPH · 40MG · уп. 10", "I-AMP · 8 MG / 2 ML · уп. 5", "SYR · 15 ML / 100 ML + 0.1 ML / 100 ML · уп. 100 ML", "SYR · 29.8 MG / 5 ML + 1.2 MG / 5 ML · уп. 150 ML", "INJ · 5 MG / ML · уп. 10", "INJ · 15 MG / ML · уп. 10 * 1 ML", "TC-TAB FC · 60мг · уп. 30", "TC-TAB FC · 90мг · уп. 30", "TC-TAB FC · 120мг · уп. 30", "TC-TAB FC · 2.5 MG · уп. 30", "I-INF · 500 мг/100 мл · уп. 1", "TC-CAP · 300+300+50mg · уп. 30", "TC-TAB FC · 5 MG · уп. 5х10", "I-VIAL · 1000mg · уп. 1", "TABLETS · 500 MG · уп. 1 X 3", "TABLETS · 0.5 MG · уп. 8", "TABLETS · 50 MG · уп. 40", "CREAM · 6.4 MG + 100 MG + 10 MG · уп. 10G", "CAPSULES · 150 MG · уп. 1", "CREAM · 0.01 · уп. 10G", "CAPSULES · 1 capsule: (56,5 mg + 2,5 mg + 1 … · уп. 30 + 30", "CAPSULES · 61.75 MG + 16.25 MG + 13 MG + 9. … · уп. 60", "CAPSULES · 42.5 MG + 2500 IU + 200 IU + 2 M … · уп. 30", "SACHET · 1.25 MLD CFU + 3 MLD CFU + 25 MG · уп. 10", "I-INJ · 1 G · уп. 1", "SYRUP · /// · уп. 150ml", "SUPP · 100 MG + 100 MG · уп. 7", "TABLETS · 5 MG · уп. 28", "TABLETS · 20 MG · уп. 4", "I-AMP · 100mg/5ml · уп. 5", "VG-SOL · 100 ml · уп. №4", "VAGINAL TABLETS · 750 + 200 + 100 · уп. 7", "CAPSULES · 550 MG + /// + 0.24 MG · уп. 30", "Oral Amp · 20 mg + 1000 mg + 200 mg + 1,5 m … · уп. 10ml*10", "I-AMP · 100mg/5ml · уп. 5", "Pow. For Inj. · 5 G · уп. 1 vial + 1 amp. of solvent", "Tabs · 500 mg + 300 mg + 200 mg + 6,7 m … · уп. 30", "Oral drop · 3 mcg/ml + 400 mcg/ml · уп. 30ml", "Drops · 15000 IU/ml · уп. 20ml", "SYR · 2.295 G + 2.228 G + 2.228 G + 1. … · уп. 150 ML", "INJ · 1000mg · уп. 15 ml", "VG-SUPP · 750mg+200mg+100mln · уп. 1x7", "VG-SUPP · 500mg+65,000+100,000 IU · уп. 2x5", "I-INF · 200mg/100ml · уп. 100mlx1, Glass bottle", "I-INF · 4mg/100 ml · уп. 100mlx1, Non PVC Bag"];
+const TODAY = '26-11-13';
+const DOCS = ['Dossier', 'Artwork', 'Leaflet', 'CPP/FSC', 'Sample', 'WS', 'COA'];
+const STAGES = [
+  ['Готовится', '#f1f1ee', '#3d4048'], ['Ждёт экспертизы', '#e6ebf7', '#22346b'],
+  ['Первичная оплачена', '#d3dcf1', '#1f2a4d'], ['Специализированная оплачена', '#1f2a4d', '#ffffff'],
+  ['Стоп', '#fbe4e1', '#a8352c']
+];
+const P = (r) => ({ n: r[0], dose: r[1], ru: r[2], gen: r[3], form: r[4], cat: r[5], own: r[6], mfg: r[7], st: r[8], g: r[9], inn: r[10], task: r[11], zd: r[12], ad: r[13], pd: r[14], mpl: r[15], plru: r[16], pei: r[17], pep: r[18], sei: r[19], sep: r[20], docs: r[21], cm: r[22] });
+const ALL = D.map((r, i) => ({ ...P(r), spec: SPEC[i] }));
+const ms = (s) => new Date('20' + s).getTime();
+const days = (a, b) => Math.round((ms(b) - ms(a)) / 864e5);
+const fmt = (s) => (s ? s.slice(6, 8) + '.' + s.slice(3, 5) + '.20' + s.slice(0, 2) : '—');
+function stageOf(r) {
+  if (r.g === 'stop') return 4;
+  if (!r.pd) return 0;
+  if (r.sep) return 3;
+  if (r.pep) return 2;
+  return 1;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'all', q: '', sel: 22 };
+  }
+
+  renderVals() {
+    const { tab, q, sel } = this.state;
+    const ql = q.trim().toLowerCase();
+    const withIdx = ALL.map((r, i) => ({ ...r, i, s: stageOf(r) }));
+    const tabDefs = [['all', 'Все'], [0, 'Готовятся'], [1, 'Ждут экспертизы'], [2, 'Первичная оплачена'], [3, 'Специализированная оплачена'], [4, 'Стоп']];
+    const inTab = (r, t) => (t === 'all' ? r.s !== 4 : r.s === t);
+    const tabs = tabDefs.map(([v, label]) => {
+      const on = tab === v;
+      return {
+        label, on, n: withIdx.filter((r) => inTab(r, v)).length,
+        bg: on ? '#16181d' : '#ffffff', fg: on ? '#ffffff' : '#3d4048',
+        cntBg: on ? 'rgba(255,255,255,0.2)' : '#f1f1ee',
+        pick: () => this.setState({ tab: v })
+      };
+    });
+    const list = withIdx.filter((r) => inTab(r, tab)).filter((r) => !ql
+      || (r.n + ' ' + r.ru + ' ' + r.gen + ' ' + r.mfg).toLowerCase().includes(ql));
+
+    const rows = list.map((r) => {
+      const late = r.mpl && !r.pd && r.mpl < TODAY;
+      return {
+        n: r.n, spec: r.spec, mfg: r.mfg, cat: r.cat,
+        stage: STAGES[r.s][0], stBg: STAGES[r.s][1], stFg: STAGES[r.s][2],
+        pd: r.pd ? fmt(r.pd) : (late ? 'план ' + fmt(r.mpl) : '—'),
+        pdColor: late ? '#c0392f' : '#16181d',
+        ru: fmt(r.plru), ruColor: r.plru ? '#16181d' : '#9a9da4',
+        rowBg: r.i === sel ? '#f4f6fb' : 'transparent',
+        pick: () => this.setState({ sel: r.i })
+      };
+    });
+
+    const s = withIdx[sel];
+    let shift = '—', shiftColor = '#ffffff';
+    if (s.mpl && s.pd) {
+      const d = days(s.mpl, s.pd);
+      shift = (d > 0 ? '+' : '') + d + ' дн.';
+      shiftColor = d > 31 ? '#f2a596' : (d > 0 ? '#f3d27a' : '#a8e8c2');
+    } else if (s.mpl && !s.pd && s.mpl < TODAY) {
+      shift = '+' + days(s.mpl, TODAY) + ' дн.';
+      shiftColor = '#f2a596';
+    }
+    const stepDefs = [
+      ['Задача получена', s.task], ['Досье запрошено', s.zd], ['Досье проанализировано', s.ad],
+      ['Подано в Минздрав', s.pd], ['Первичная: инвойс', s.pei], ['Первичная: оплата', s.pep],
+      ['Специализированная: инвойс', s.sei], ['Специализированная: оплата', s.sep], ['План РУ', s.plru]
+    ];
+    const steps = stepDefs.map(([label, d]) => ({
+      label, d: fmt(d), dot: d ? '#c8f04b' : 'rgba(255,255,255,0.2)', color: d ? '#ffffff' : '#8f9ac0'
+    }));
+    const docN = s.docs.split('').filter((c) => c === '1').length;
+
+    return {
+      q, onSearch: (e) => this.setState({ q: e.target.value }),
+      tabs, rows, empty: rows.length === 0,
+      sel: {
+        n: s.n, ru: s.ru, spec: s.spec, gen: s.gen,
+        meta: s.mfg + ' · ' + s.cat,
+        stage: STAGES[s.s][0],
+        hasPlan: !!s.mpl, mpl: fmt(s.mpl), pd: fmt(s.pd), shift, shiftColor,
+        steps, docN,
+        docs: s.docs.split('').map((c, k) => ({ t: DOCS[k], bg: c === '1' ? 'rgba(200, 240, 75, 0.18)' : 'rgba(255,255,255,0.06)', fg: c === '1' ? '#d9f58a' : '#8f9ac0' })),
+        hasCm: !!s.cm, cm: s.cm
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

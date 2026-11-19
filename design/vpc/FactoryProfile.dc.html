@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Профиль завода</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f4f1}
+a{color:oklch(0.47 0.14 262);text-decoration:none}a:hover{color:oklch(0.38 0.14 262)}
+.navp{display:inline-flex;align-items:center;height:38px;padding:0 16px;border-radius:999px;font-size:13px;color:#5d616a;white-space:nowrap}
+.navp:hover{background:#f6f6f3;color:#16181d}
+.th{font-size:11.5px;color:#8b8f97;font-weight:500;white-space:nowrap}
+.pr{display:grid;grid-template-columns:minmax(200px,1.3fr) 56px 96px minmax(200px,1.2fr) 74px 150px;gap:16px;align-items:center;padding:0 10px;border-radius:10px;color:#16181d}
+.prr{height:56px;border-bottom:1px solid #f1f1ee}
+.prr:hover{background:#f6f6f3;color:#16181d}
+.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:-.01em}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #f4f4f1; color: #16181d; font-family: Onest, system-ui, -apple-system, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums;">
+  <header style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 16px 28px 4px;">
+    <a href="Main.dc.html" aria-label="ВПЦ — главная" style="display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px 0 13px; border-radius: 16px; background: oklch(0.26 0.075 268); color: #fff; font-weight: 600; font-size: 15px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1.2" fill="#fff"></rect><rect x="9.75" y="8" width="4.5" height="13" rx="1.2" fill="#c5f135"></rect><rect x="16.5" y="3" width="4.5" height="18" rx="1.2" fill="#c5f135"></rect></svg>
+      ВПЦ
+    </a>
+    <nav aria-label="Разделы" style="display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; background: #fff; margin: 0 auto; flex-wrap: wrap;">
+      <a href="Main.dc.html" class="navp">Предложения</a>
+      <a href="Factories.dc.html" class="navp" style="background: #16181d; color: #fff; font-weight: 500;">Заводы</a>
+      <a href="Countries.dc.html" class="navp">Страны</a>
+      <a href="Funnel.dc.html" class="navp">Воронка и динамика</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 14px; border-radius: 999px; background: #fff;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.58 0.15 155);"></span>
+      <span style="font-size: 12.5px; color: #6b6f78; padding: 0 10px 0 4px; white-space: nowrap;">Выгрузка ВПЦ · 10.11.2026 · 19 424 позиции</span>
+      <button type="button" style="height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: #16181d; color: #fff; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;">Обновить выгрузку</button>
+    </div>
+  </header>
+
+  <main style="max-width: 1440px; margin: 0 auto; padding: 22px 28px 48px; display: flex; flex-direction: column; gap: 20px;">
+    <nav aria-label="Путь" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #8b8f97; flex-wrap: wrap;">
+      <a href="Factories.dc.html" style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 8px; border-radius: 999px; background: #fff; color: #3d4048;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>Назад</a>
+      <a href="Factories.dc.html">Заводы</a><span>›</span><span style="color: #16181d; font-weight: 500;">RONTIS</span>
+      <span style="margin-left: 8px; display: inline-block; padding: 1px 8px; border-radius: 6px; background: oklch(0.96 0.05 85); color: oklch(0.45 0.1 70); font-size: 12px; font-weight: 600;">демо-данные</span>
+    </nav>
+
+    <section style="display: flex; flex-wrap: wrap; gap: 24px 44px; padding: 28px 30px; border-radius: 22px; background: oklch(0.26 0.075 268); color: #fff;">
+      <div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 22px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <span style="font-size: 13px; color: oklch(0.84 0.04 268);">Завод</span>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h1 style="margin: 0; font-size: 38px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05;">RONTIS</h1>
+            <span style="padding: 4px 8px; border-radius: 6px; background: oklch(1 0 0 / 0.12); font-size: 12px; font-weight: 700;">GR · Greece</span>
+            <span style="padding: 4px 8px; border-radius: 6px; background: oklch(1 0 0 / 0.12); font-size: 12px; font-weight: 600;">УДС</span>
+          </div>
+          <span style="font-size: 13px; color: oklch(0.84 0.04 268);">Первое предложение 03.2022 · последнее движение 10.11.2026 · БДМ Irini Kouimtzidou</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; color: oklch(0.82 0.04 268);">Предложений</span><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">48</span><span style="font-size: 12px; color: oklch(0.84 0.04 268);">30 МНН</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; color: oklch(0.82 0.04 268);">Ценовой индекс</span><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: oklch(0.84 0.14 155);">+6%</span><span style="font-size: 12px; color: oklch(0.84 0.04 268);">к лучшей цене рынка</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; color: oklch(0.82 0.04 268);">Контракты</span><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">5</span><span style="font-size: 12px; color: oklch(0.84 0.04 268);">10% предложений</span></div>
+          <div style="display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 12px; color: oklch(0.82 0.04 268);">Ответ завода</span><span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">9 дн.</span><span style="font-size: 12px; color: oklch(0.84 0.04 268);">медиана, быстрее рынка</span></div>
+        </div>
+      </div>
+      <div style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 12px;">
+        <span style="font-size: 13px; color: oklch(0.84 0.04 268);">Предложения завода по этапам</span>
+        <div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 14px; background: oklch(1 0 0 / 0.07);">
+          <sc-for list="{{ stages }}" as="s" hint-placeholder-count="8">
+            <a href="Drill.dc.html" style="display: grid; grid-template-columns: 52px minmax(0, 150px) 1fr 30px; gap: 10px; align-items: center; height: 26px; color: #fff;">
+              <span style="font-size: 12px; font-weight: 700;">{{ s.k }}</span>
+              <span style="font-size: 12.5px; color: oklch(0.84 0.04 268); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.name }}</span>
+              <span style="display: block; height: 8px; border-radius: 4px; background: oklch(1 0 0 / 0.08); overflow: hidden;"><span style="{{ s.bar }}"></span></span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; text-align: right;">{{ s.n }}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+      <section style="flex: 999 1 780px; min-width: 0; background: #fff; border-radius: 20px; padding: 22px 24px 12px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px;">
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em;">Продукты завода и цена против рынка</span>
+          <span style="font-size: 12px; color: #8b8f97;">полоса — разброс цен всех заводов по продукту, точка — цена RONTIS</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <div style="min-width: 820px;">
+            <div class="pr" style="height: 34px; border-bottom: 1px solid #e3e3df;">
+              <span class="th">Продукт</span><span class="th">Для</span><span class="th" style="text-align: right;">Цена за уп.</span><span class="th">Место в рынке</span><span class="th" style="text-align: right;">К мин.</span><span class="th">Статус</span>
+            </div>
+            <sc-for list="{{ prods }}" as="p" hint-placeholder-count="8">
+              <a href="Offer.dc.html" class="pr prr">
+                <span style="display: flex; flex-direction: column; line-height: 1.25; min-width: 0;">
+                  <span style="font-size: 14px; font-weight: 600;">{{ p.g }}</span>
+                  <span style="font-size: 11.5px; color: #8b8f97;">{{ p.f }}</span>
+                </span>
+                <span><span style="{{ p.cc }}">{{ p.c }}</span></span>
+                <span class="mono" style="text-align: right; font-weight: 600;">{{ p.price }}</span>
+                <span style="display: flex; flex-direction: column; gap: 3px;">
+                  <span style="position: relative; height: 12px;">
+                    <span style="position: absolute; left: 0; right: 0; top: 5px; height: 2px; border-radius: 1px; background: #f0f0ec;"></span>
+                    <span style="{{ p.range }}"></span>
+                    <span style="{{ p.dot }}"></span>
+                  </span>
+                  <span style="display: flex; justify-content: space-between; font-size: 10.5px; color: #8b8f97;"><span>{{ p.lo }}</span><span>{{ p.n }} заводов</span><span>{{ p.hi }}</span></span>
+                </span>
+                <span class="mono" style="{{ p.dlStyle }}">{{ p.dl }}</span>
+                <span style="{{ p.stStyle }}"><span style="{{ p.stDot }}"></span>{{ p.st }}</span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section style="flex: 1 1 360px; min-width: 0; background: #fff; border-radius: 20px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em;">Последние события</span>
+          <span style="font-size: 12px; color: #8b8f97;">смена статуса и комментарии</span>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <sc-for list="{{ events }}" as="e" hint-placeholder-count="6">
+            <a href="Offer.dc.html" style="display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid #f3f3f0; color: #16181d;">
+              <span style="{{ e.dot }}"></span>
+              <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                <span style="font-size: 13.5px; font-weight: 600;">{{ e.title }}</span>
+                <span style="font-size: 12.5px; color: #6b6f78;">{{ e.text }}</span>
+                <span style="font-size: 11.5px; color: #8b8f97;">{{ e.date }}</span>
+              </span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1460}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const hue = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
+    const chip = (c) => { const h = hue(c); return 'display:inline-block;border-radius:5px;padding:3px 6px;font-size:10.5px;font-weight:700;line-height:1;background:oklch(0.93 0.05 ' + h + ');color:oklch(0.36 0.11 ' + h + ')'; };
+    const S = [['Вб', 'Выборка', 6], ['ПО', 'Прогноз объёма', 9], ['АЦ', 'Анализ цен', 11], ['ПцКк', 'Процесс контракта', 3], ['Кк', 'Контракт', 5], ['ПцР', 'Процесс регистрации', 2], ['Р', 'Получено РУ', 1], ['Стоп', 'Остановлено', 11]];
+    const stages = S.map(([k, name, n]) => ({ k, name, n, bar: 'display:block;height:100%;border-radius:4px;width:' + (n / 11 * 100) + '%;background:' + (k === 'Стоп' ? 'oklch(1 0 0 / 0.3)' : k === 'Р' ? 'oklch(0.84 0.14 155)' : k === 'Кк' ? 'oklch(0.78 0.11 200)' : 'oklch(0.72 0.11 268)') }));
+    const kinds = { a: ['oklch(0.52 0.16 268)', '#3d4048'], c: ['oklch(0.62 0.13 200)', 'oklch(0.4 0.09 200)'], s: ['#c4c6cb', '#8b8f97'] };
+    const P = [
+      ['SILODOSIN', 'TC-CAP · 8 MG · №30', 'RU', 1.50, 1.20, 2.60, 11, 'АЦ', 'a'],
+      ['FEBUXOSTAT', 'TC-TAB FC · 80 MG · №30', 'RU', 2.50, 2.10, 3.40, 8, 'АЦ', 'a'],
+      ['TADALAFIL', 'TC-TAB FC · 5 MG · №28', 'KZ', 0.92, 0.92, 1.70, 9, 'Кк', 'c'],
+      ['ESOMEPRAZOLE', 'TC-CAP · 40 MG · №28', 'KZ', 1.84, 1.55, 2.30, 12, 'ПцКк', 'a'],
+      ['PREGABALIN', 'TC-CAP · 150 MG · №56', 'RU', 3.10, 2.40, 3.90, 7, 'ПО', 'a'],
+      ['ROSUVASTATIN', 'TC-TAB FC · 20 MG · №30', 'KZ', 1.12, 0.88, 1.60, 15, 'Кк', 'c'],
+      ['APIXABAN', 'TC-TAB FC · 5 MG · №60', 'RU', 4.80, 3.20, 5.10, 10, 'SПО', 's'],
+      ['DAPAGLIFLOZIN', 'TC-TAB FC · 10 MG · №30', 'RU', 2.20, 1.95, 3.00, 9, 'Вб', 'a']
+    ];
+    const f = (v) => v.toFixed(2).replace('.', ',');
+    const prods = P.map(([g, fd, c, p, lo, hi, n, st, k]) => {
+      const pos = ((p - lo) / (hi - lo) * 100).toFixed(1);
+      const dl = Math.round((p / lo - 1) * 100);
+      return {
+        g, f: fd, c, cc: chip(c), price: f(p), lo: f(lo), hi: f(hi), n, st,
+        range: 'position:absolute;left:0;right:0;top:4px;height:4px;border-radius:2px;background:linear-gradient(90deg,oklch(0.58 0.15 155),oklch(0.85 0.04 268) 50%,oklch(0.6 0.19 25))',
+        dot: 'position:absolute;top:0;width:12px;height:12px;border-radius:50%;margin-left:-6px;background:#16181d;box-shadow:0 0 0 2px #fff;left:' + pos + '%',
+        dl: dl === 0 ? 'мин.' : '+' + dl + '%',
+        dlStyle: 'text-align:right;font-size:12.5px;' + (dl === 0 ? 'color:oklch(0.4 0.11 155);font-weight:600' : dl < 15 ? 'color:#6b6f78' : 'color:oklch(0.45 0.15 25)'),
+        stStyle: 'display:inline-flex;align-items:center;gap:6px;width:max-content;border:1px solid #e3e3df;border-radius:999px;padding:1px 9px 1px 7px;font-size:12px;font-weight:600;color:' + kinds[k][1],
+        stDot: 'width:7px;height:7px;border-radius:50%;background:' + kinds[k][0]
+      };
+    });
+    const E = [
+      ['SILODOSIN → АЦ', 'Прислали цену 1,50 USD, анализируем', '10.11.2026', 'oklch(0.52 0.16 268)'],
+      ['ROSUVASTATIN → Кк', 'Контракт подписан, готовим досье для KZ', '28.10.2026', 'oklch(0.62 0.13 200)'],
+      ['ESOMEPRAZOLE · комментарий', 'Юристы согласуют проект договора', '21.10.2026', '#c4c6cb'],
+      ['APIXABAN → SПО', 'Стоп: МОК 50 000 уп. не подходит', '02.10.2026', 'oklch(0.6 0.19 25)'],
+      ['TADALAFIL → Кк', 'Контракт подписан', '14.09.2026', 'oklch(0.62 0.13 200)'],
+      ['PREGABALIN → ПО', 'Отправили прогноз объёма на 3 года', '30.08.2026', 'oklch(0.52 0.16 268)']
+    ];
+    const events = E.map(([title, text, date, c]) => ({ title, text, date, dot: 'width:10px;height:10px;border-radius:50%;margin-top:5px;background:' + c }));
+    return { stages, prods, events };
+  }
+}
+</script>
+</body>
+</html>

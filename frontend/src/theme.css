@@ -1,0 +1,75 @@
+@theme {
+  --font-sans: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-canvas: #f4f4f1;
+  --color-surface: #ffffff;
+  --color-sidebar: #fbfbfa;
+  --color-subtle: #f6f6f3;
+  --color-track: #f0f0ec;
+  --color-seg: #ebebe7;
+  --color-line: #f1f1ee;
+  --color-line-strong: #e3e3df;
+
+  --color-fg: #16181d;
+  --color-fg-2: #3d4048;
+  --color-muted: #5d616a;
+  --color-muted-2: #6b6f78;
+  --color-faint: #8b8f97;
+  --color-faintest: #a3a6ad;
+
+  --color-accent: oklch(0.47 0.14 262);
+  --color-accent-hover: oklch(0.38 0.14 262);
+  --color-accent-bar: oklch(0.52 0.16 268);
+  --color-accent-soft: oklch(0.86 0.05 268);
+  --color-accent-tint: oklch(0.97 0.015 262);
+  --color-ink: oklch(0.26 0.075 268);
+  --color-ink-hover: oklch(0.29 0.08 268);
+  --color-ink-fg-2: oklch(0.84 0.04 268);
+  --color-ink-glass: oklch(1 0 0 / 0.07);
+  --color-ink-line: oklch(1 0 0 / 0.12);
+
+  --color-pos: oklch(0.52 0.13 155);
+  --color-pos-on-ink: oklch(0.84 0.14 155);
+  --color-pos-tint: oklch(0.95 0.045 155);
+  --color-neg: oklch(0.55 0.18 25);
+  --color-neg-on-ink: oklch(0.78 0.14 25);
+  --color-neg-tint: oklch(0.95 0.035 25);
+
+  --color-cat-priority: oklch(0.58 0.15 155);
+  --color-cat-watch: oklch(0.78 0.15 78);
+  --color-cat-miss: #e2e3e7;
+  --color-cat-stop: oklch(0.6 0.19 25);
+
+  --color-rgs-ink: #1f2a4d;
+  --color-lime: #c5f135;
+  --color-lime-soft: #c8f04b;
+
+  --color-st-work: oklch(0.52 0.16 268);
+  --color-st-contract: oklch(0.62 0.13 200);
+  --color-st-result: oklch(0.58 0.15 155);
+  --color-st-stop: #5d616a;
+  --color-bad: oklch(0.6 0.19 25);
+  --color-bad-tint: #fbe4e1;
+  --color-bad-ink: #a8352c;
+  --color-warn-tint: #fbf1d6;
+  --color-warn-ink: #6b4e00;
+
+  --radius-card: 20px;
+  --radius-hero: 22px;
+  --radius-inner: 14px;
+  --radius-ctl: 10px;
+  --radius-row: 8px;
+
+  --shadow-pop: 0 12px 32px rgba(16, 24, 40, 0.12);
+  --shadow-panel: -16px 0 48px rgba(16, 24, 40, 0.12);
+  --shadow-seg-active: 0 1px 2px rgba(16, 24, 40, 0.08);
+
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-canvas);
+  color: var(--color-fg);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Заводы</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f4f1}
+a{color:oklch(0.47 0.14 262);text-decoration:none}a:hover{color:oklch(0.38 0.14 262)}
+.navp{display:inline-flex;align-items:center;height:38px;padding:0 16px;border-radius:999px;font-size:13px;color:#5d616a;white-space:nowrap}
+.navp:hover{background:#f6f6f3;color:#16181d}
+.th{font-size:11.5px;color:#8b8f97;font-weight:500;white-space:nowrap}
+.rk{display:grid;grid-template-columns:26px minmax(190px,1.3fr) 70px 60px 120px minmax(150px,1fr) 104px 116px;gap:14px;align-items:center;padding:0 10px;border-radius:10px}
+.rkr{height:56px;border-bottom:1px solid #f1f1ee;color:#16181d}
+.rkr:hover{background:#f6f6f3;color:#16181d}
+.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:13px;letter-spacing:-.01em}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #f4f4f1; color: #16181d; font-family: Onest, system-ui, -apple-system, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums;">
+  <header style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 16px 28px 4px;">
+    <a href="Main.dc.html" aria-label="ВПЦ — главная" style="display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 16px 0 13px; border-radius: 16px; background: oklch(0.26 0.075 268); color: #fff; font-weight: 600; font-size: 15px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="13" width="4.5" height="8" rx="1.2" fill="#fff"></rect><rect x="9.75" y="8" width="4.5" height="13" rx="1.2" fill="#c5f135"></rect><rect x="16.5" y="3" width="4.5" height="18" rx="1.2" fill="#c5f135"></rect></svg>
+      ВПЦ
+    </a>
+    <nav aria-label="Разделы" style="display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; background: #fff; margin: 0 auto; flex-wrap: wrap;">
+      <a href="Main.dc.html" class="navp">Предложения</a>
+      <a href="Factories.dc.html" class="navp" style="background: #16181d; color: #fff; font-weight: 500;">Заводы</a>
+      <a href="Countries.dc.html" class="navp">Страны</a>
+      <a href="Funnel.dc.html" class="navp">Воронка и динамика</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 14px; border-radius: 999px; background: #fff;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: oklch(0.58 0.15 155);"></span>
+      <span style="font-size: 12.5px; color: #6b6f78; padding: 0 10px 0 4px; white-space: nowrap;">Выгрузка ВПЦ · 10.11.2026 · 19 424 позиции</span>
+      <button type="button" style="height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: #16181d; color: #fff; font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;">Обновить выгрузку</button>
+    </div>
+  </header>
+
+  <main style="max-width: 1440px; margin: 0 auto; padding: 22px 28px 48px; display: flex; flex-direction: column; gap: 20px;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15;">Заводы</h1>
+        <span style="font-size: 14px; color: #6b6f78;">Кто предлагает, насколько дёшево и как далеко доходит · <span style="display: inline-block; padding: 1px 8px; border-radius: 6px; background: oklch(0.96 0.05 85); color: oklch(0.45 0.1 70); font-size: 12px; font-weight: 600;">демо-данные</span></span>
+      </div>
+      <div style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: #ebebe7;">
+        <button type="button" style="border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; color: #6b6f78; background: transparent; cursor: pointer;">6 месяцев</button>
+        <button type="button" style="border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.08); cursor: pointer;">12 месяцев</button>
+        <button type="button" style="border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; color: #6b6f78; background: transparent; cursor: pointer;">Всё время</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+        <div style="background: #fff; border-radius: 20px; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; min-width: 0;">
+          <span style="font-size: 13px; color: #6b6f78;">{{ k.label }}</span>
+          <span style="display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;">
+            <span style="font-size: 36px; font-weight: 600; letter-spacing: -0.03em; line-height: 1;">{{ k.value }}</span>
+            <span style="{{ k.tagStyle }}">{{ k.tag }}</span>
+          </span>
+          <span style="display: block; height: 6px; border-radius: 3px; background: #f0f0ec; overflow: hidden;"><span style="{{ k.bar }}"></span></span>
+          <span style="font-size: 12px; color: #6b6f78;">{{ k.note }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+      <section style="flex: 999 1 820px; min-width: 0; background: #fff; border-radius: 20px; padding: 22px 24px 12px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px;">
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em;">Рейтинг заводов</span>
+          <span style="font-size: 12px; color: #8b8f97;">ценовой индекс — насколько в среднем дороже лучшей цены по тем же продуктам</span>
+        </div>
+        <div style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: #ebebe7; width: max-content;">
+          <button type="button" style="border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; font-weight: 600; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.08); cursor: pointer;">По числу предложений</button>
+          <button type="button" style="border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; color: #6b6f78; background: transparent; cursor: pointer;">По цене</button>
+          <button type="button" style="border: 0; border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; color: #6b6f78; background: transparent; cursor: pointer;">По контрактам</button>
+        </div>
+        <div style="overflow-x: auto;">
+          <div style="min-width: 900px;">
+            <div class="rk" style="height: 34px; border-bottom: 1px solid #e3e3df;">
+              <span class="th">#</span><span class="th">Завод</span><span class="th" style="text-align: right;">Предл.</span><span class="th" style="text-align: right;">МНН</span><span class="th">Для стран</span><span class="th">Состояние предложений</span><span class="th" style="text-align: right;">Ценовой индекс</span><span class="th">До контракта</span>
+            </div>
+            <sc-for list="{{ rank }}" as="r" hint-placeholder-count="10">
+              <a href="FactoryProfile.dc.html" class="rk rkr">
+                <span style="font-size: 12px; color: #8b8f97; text-align: center;">{{ r.i }}</span>
+                <span style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                  <span style="{{ r.stripe }}"></span>
+                  <span style="display: flex; flex-direction: column; line-height: 1.25; min-width: 0;">
+                    <span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.name }}</span>
+                    <span style="font-size: 11.5px; color: #8b8f97;">{{ r.country }} · {{ r.cat }}</span>
+                  </span>
+                </span>
+                <span class="mono" style="text-align: right; font-weight: 600;">{{ r.n }}</span>
+                <span class="mono" style="text-align: right; color: #6b6f78;">{{ r.mnn }}</span>
+                <span style="display: flex; gap: 3px; flex-wrap: wrap;">
+                  <sc-for list="{{ r.markets }}" as="m" hint-placeholder-count="3"><span style="{{ m.style }}">{{ m.c }}</span></sc-for>
+                </span>
+                <span style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="display: flex; height: 8px; gap: 2px; border-radius: 4px; overflow: hidden; background: #f0f0ec;">
+                    <sc-for list="{{ r.mix }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}"></span></sc-for>
+                  </span>
+                  <span style="font-size: 11px; color: #8b8f97;">{{ r.mixText }}</span>
+                </span>
+                <span style="text-align: right;"><span style="{{ r.idxStyle }}">{{ r.idx }}</span></span>
+                <span style="display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 12px; color: #3d4048;"><b style="font-weight: 600;">{{ r.kk }}</b> из {{ r.n }}</span>
+                  <span style="display: block; height: 5px; border-radius: 3px; background: #f0f0ec; overflow: hidden;"><span style="{{ r.kkBar }}"></span></span>
+                </span>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+        <a href="Main.dc.html" style="font-size: 13px; font-weight: 500; padding: 4px 10px 8px;">Все 342 завода →</a>
+      </section>
+
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 20px;">
+        <section style="background: #fff; border-radius: 20px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em;">Цена по стране завода</span>
+            <span style="font-size: 12px; color: #8b8f97;">медиана к лучшей цене по продукту, %</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <sc-for list="{{ geo }}" as="g" hint-placeholder-count="7">
+              <div style="display: grid; grid-template-columns: 96px 1fr 48px; gap: 10px; align-items: center; height: 28px;">
+                <span style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ g.c }}</span>
+                <span style="position: relative; height: 10px; border-radius: 5px; background: #f0f0ec;">
+                  <span style="{{ g.bar }}"></span>
+                </span>
+                <span class="mono" style="{{ g.vStyle }}">{{ g.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section style="background: oklch(0.26 0.075 268); color: #fff; border-radius: 22px; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 13px; color: oklch(0.84 0.04 268);">Профиль завода</span>
+            <a href="FactoryProfile.dc.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; background: oklch(1 0 0 / 0.12); font-size: 12px; font-weight: 600; color: #fff;">Открыть профиль →</a>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 28px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1;">RONTIS</span>
+            <span style="font-size: 13px; color: oklch(0.84 0.04 268);">Greece · УДС · с нами с 2022 года</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11.5px; color: oklch(0.82 0.04 268);">Предложений</span><span style="font-size: 22px; font-weight: 600;">48</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11.5px; color: oklch(0.82 0.04 268);">Ценовой индекс</span><span style="font-size: 22px; font-weight: 600; color: oklch(0.84 0.14 155);">+6%</span></div>
+            <div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 11.5px; color: oklch(0.82 0.04 268);">Контрактов</span><span style="font-size: 22px; font-weight: 600;">5</span></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 14px; background: oklch(1 0 0 / 0.07);">
+            <sc-for list="{{ prof }}" as="p" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto 52px; gap: 10px; align-items: center; padding: 7px 8px; border-radius: 9px;">
+                <span style="display: flex; flex-direction: column; min-width: 0; line-height: 1.25;">
+                  <span style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.g }}</span>
+                  <span style="font-size: 11px; color: oklch(0.84 0.04 268);">{{ p.f }}</span>
+                </span>
+                <span style="{{ p.stStyle }}">{{ p.st }}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 12.5px; text-align: right;">{{ p.p }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const hue = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360; return h; };
+    const chip = (c) => { const h = hue(c); return 'display:inline-block;border-radius:5px;padding:3px 5px;font-size:10px;font-weight:700;line-height:1;background:oklch(0.93 0.05 ' + h + ');color:oklch(0.36 0.11 ' + h + ')'; };
+    const kpis = [
+      { label: 'Заводов в выгрузке', value: '342', tag: '+18 за 90 дн.', tone: 'pos', fill: 1, note: 'из 24 стран' },
+      { label: 'Активны сейчас', value: '128', tag: '37%', tone: 'neu', fill: 0.37, note: 'есть хотя бы одно предложение в работе' },
+      { label: 'Дошли до контракта', value: '41', tag: '12%', tone: 'pos', fill: 0.12, note: 'подписан контракт хотя бы по одному продукту' },
+      { label: 'Медиана до контракта', value: '96 дн.', tag: '−8 дн. г/г', tone: 'pos', fill: 0.55, note: 'от первого запроса до подписания' }
+    ].map((k) => ({
+      ...k,
+      tagStyle: 'display:inline-block;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600;' + (k.tone === 'pos' ? 'background:oklch(0.95 0.045 155);color:oklch(0.4 0.11 155)' : 'background:#f0f0ec;color:#5d616a'),
+      bar: 'display:block;height:100%;border-radius:3px;background:oklch(0.52 0.16 268);width:' + (k.fill * 100) + '%'
+    }));
+    const R = [
+      ['ZYDUS', 'India', 'НПП', 64, 41, ['RU', 'KZ', 'UZ', 'GE'], [38, 9, 17], -12, 9],
+      ['RONTIS', 'Greece', 'УДС', 48, 30, ['RU', 'KZ'], [29, 5, 14], 6, 5],
+      ['POLPHARMA', 'Poland', 'НПП', 45, 28, ['RU', 'UZ', 'AZ'], [22, 8, 15], 9, 8],
+      ['MICRO LABS', 'India', 'НПП-', 41, 33, ['KZ', 'UZ', 'MN'], [30, 2, 9], -18, 2],
+      ['KRKA', 'Slovenia', 'НПП', 37, 22, ['RU', 'KZ', 'GE'], [17, 11, 9], 15, 11],
+      ['QILU', 'China', 'НПП-', 35, 27, ['UZ', 'KG', 'MN'], [24, 4, 7], -9, 4],
+      ['ABDI IBRAHIM', 'Turkey', 'НПП', 31, 19, ['AZ', 'GE', 'KZ'], [16, 3, 12], 4, 3],
+      ['ADAMED', 'Poland', 'УДС', 28, 18, ['RU', 'UZ'], [14, 3, 11], 11, 3],
+      ['DEVA', 'Turkey', 'НПП', 26, 21, ['AZ', 'KZ'], [9, 2, 15], 2, 2],
+      ['GEDEON', 'Hungary', 'НПП', 22, 14, ['RU', 'GE'], [12, 4, 6], 21, 4]
+    ];
+    const rank = R.map(([name, country, cat, n, mnn, markets, mix, idx, kk], i) => {
+      const col = ['oklch(0.52 0.16 268)', 'oklch(0.58 0.15 155)', '#c4c6cb'];
+      return {
+        i: i + 1, name, country, cat, n, mnn, kk,
+        stripe: 'width:4px;height:28px;border-radius:2px;flex-shrink:0;background:oklch(0.6 0.12 ' + hue(country) + ')',
+        markets: markets.map((c) => ({ c, style: chip(c) })),
+        mix: mix.map((v, j) => ({ style: 'display:block;height:100%;flex:' + v + ' 1 0%;background:' + col[j] })),
+        mixText: mix[0] + ' в работе · ' + mix[1] + ' результат · ' + mix[2] + ' стоп',
+        idx: (idx > 0 ? '+' : idx < 0 ? '−' : '') + Math.abs(idx) + '%',
+        idxStyle: 'display:inline-block;border-radius:6px;padding:3px 8px;font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:500;' + (idx <= 0 ? 'background:oklch(0.95 0.045 155);color:oklch(0.4 0.11 155)' : idx < 10 ? 'background:#f0f0ec;color:#3d4048' : 'background:oklch(0.95 0.035 25);color:oklch(0.45 0.15 25)'),
+        kkBar: 'display:block;height:100%;border-radius:3px;background:oklch(0.58 0.15 155);width:' + Math.round(kk / n * 100) + '%'
+      };
+    });
+    const G = [['India', -16], ['China', -10], ['Turkey', 3], ['Greece', 6], ['Poland', 9], ['Slovenia', 15], ['Hungary', 21]];
+    const gmax = 25;
+    const geo = G.map(([c, v]) => ({
+      c, v: (v > 0 ? '+' : '−') + Math.abs(v) + '%',
+      bar: 'position:absolute;top:0;bottom:0;border-radius:5px;' + (v < 0 ? 'right:50%;background:oklch(0.58 0.15 155);' : 'left:50%;background:oklch(0.6 0.19 25);') + 'width:' + (Math.abs(v) / gmax * 50).toFixed(1) + '%',
+      vStyle: 'font-size:12.5px;text-align:right;color:' + (v < 0 ? 'oklch(0.4 0.11 155)' : 'oklch(0.45 0.15 25)')
+    }));
+    const P = [
+      ['SILODOSIN', 'TC-CAP · 8 MG · RU', 'АЦ', 'a', '1,50'],
+      ['FEBUXOSTAT', 'TC-TAB FC · 80 MG · RU', 'АЦ', 'a', '2,50'],
+      ['TADALAFIL', 'TC-TAB FC · 5 MG · KZ', 'Кк', 'r', '0,92'],
+      ['ESOMEPRAZOLE', 'TC-CAP · 40 MG · KZ', 'ПцКк', 'a', '1,84'],
+      ['APIXABAN', 'TC-TAB FC · 5 MG · RU', 'SПО', 's', '—']
+    ];
+    const prof = P.map(([g, f, st, k, p]) => ({
+      g, f, st, p,
+      stStyle: 'display:inline-block;border-radius:999px;padding:2px 9px;font-size:11.5px;font-weight:600;' + (k === 'r' ? 'background:oklch(0.78 0.16 155 / 0.2);color:oklch(0.86 0.14 155)' : k === 's' ? 'background:oklch(1 0 0 / 0.08);color:oklch(0.84 0.04 268)' : 'background:oklch(1 0 0 / 0.14);color:#fff')
+    }));
+    return { kpis, rank, geo, prof };
+  }
+}
+</script>
+</body>
+</html>

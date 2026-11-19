@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Обзор регистрации</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f4f4f1}
+a{color:#2f56a8}a:hover{color:#203f80}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="min-height: 1500px; background: #f4f4f1; font-family: 'Onest', system-ui, sans-serif; color: #16181d; font-variant-numeric: tabular-nums;">
+<div style="max-width: 1080px; margin: 0 auto; padding: 24px 28px 64px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; background: #1f2a4d; color: #c8f04b; font-weight: 700; font-size: 13px; letter-spacing: 0.02em;">RGS</span>
+      <span style="display: flex; flex-direction: column; line-height: 1.3;">
+        <span style="font-size: 15px; font-weight: 600;">Регистрация · Азербайджан</span>
+        <span style="font-size: 12px; color: #6b6f78;">Данные трекера на 13.11.2026</span>
+      </span>
+    </div>
+    <nav aria-label="Разделы" style="display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #ffffff;">
+      <a href="Main.dc.html" aria-current="page" style="padding: 9px 18px; border-radius: 999px; background: #16181d; color: #ffffff; font-size: 13px; font-weight: 500; text-decoration: none;">Обзор</a>
+      <a href="Products.dc.html" style="padding: 9px 18px; border-radius: 999px; color: #5d616a; font-size: 13px; text-decoration: none;">Препараты</a>
+    </nav>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 8px;">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.02em;">Как идёт регистрация</h1>
+    <div role="group" aria-label="Категория" style="display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: #ffffff;">
+      <sc-for list="{{catBtns}}" as="b" hint-placeholder-count="4">
+        <button type="button" aria-pressed="{{b.on}}" onClick="{{b.pick}}" style="border: 0; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 500; cursor: pointer; background: {{b.bg}}; color: {{b.fg}};">{{b.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <section style="border-radius: 24px; background: #1f2a4d; color: #ffffff; padding: 30px 32px; display: flex; flex-direction: column; gap: 26px;">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #ffffff;">Где мы сейчас</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 20px;">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 8px; padding-left: 18px; border-left: 2px solid {{k.line}};">
+          <span style="font-size: 48px; font-weight: 600; letter-spacing: -0.04em; line-height: 1; color: {{k.color}};">{{k.v}}</span>
+          <span style="font-size: 14px; color: #c3cbe6;">{{k.label}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="border-radius: 24px; background: #ffffff; padding: 28px 32px; display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #16181d;">На каком этапе</h2>
+      <span style="font-size: 12px; color: #6b6f78;">«Дошли» — сколько позиций прошли этап, «сейчас здесь» — сколько стоят на нём</span>
+    </div>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px;">
+        <thead>
+          <tr style="text-align: left; color: #8a8e96; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">
+            <th style="padding: 10px 8px; font-weight: 500;">Этап</th>
+            <th style="padding: 10px 8px; font-weight: 500; text-align: right; width: 70px;">Дошли</th>
+            <th style="padding: 10px 8px; font-weight: 500; width: 40%;"></th>
+            <th style="padding: 10px 8px; font-weight: 500; text-align: right; width: 120px;">Сейчас здесь</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{funnel}}" as="f" hint-placeholder-count="7">
+            <tr style="border-top: 1px solid #f1f1ee;">
+              <td style="padding: 12px 8px;">{{f.label}}</td>
+              <td style="padding: 12px 8px; text-align: right; font-weight: 600; color: #1f2a4d;">{{f.reached}}</td>
+              <td style="padding: 12px 8px;"><span style="display: flex; height: 12px; border-radius: 99px; background: #f1f1ee;"><span style="width: {{f.w}}%; border-radius: 99px; background: {{f.bg}};"></span></span></td>
+              <td style="padding: 12px 8px; text-align: right; font-weight: 600; color: {{f.nowColor}};">{{f.now}}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section style="border-radius: 24px; background: #ffffff; padding: 28px 32px; display: flex; flex-direction: column; gap: 22px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #16181d;">Когда получим РУ</h2>
+      <span style="font-size: 12px; color: #6b6f78;">План от 14.05.2026 + 2 месяца запаса · без плана: {{noPlan}}</span>
+    </div>
+    <div style="overflow-x: auto;">
+      <div style="display: flex; align-items: flex-end; gap: 8px; min-width: 720px; height: 190px;">
+        <sc-for list="{{months}}" as="m" hint-placeholder-count="13">
+          <button type="button" onClick="{{m.pick}}" aria-pressed="{{m.on}}" aria-label="{{m.aria}}" style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 190px; border: 0; padding: 0 2px; border-radius: 12px 12px 0 0; cursor: pointer; background: {{m.colBg}};">
+            <span style="font-size: 16px; font-weight: 600; color: #1f2a4d;">{{m.txt}}</span>
+            <span style="width: 100%; max-width: 44px; height: {{m.h}}px; border-radius: 8px 8px 3px 3px; background: {{m.bg}};"></span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display: flex; gap: 8px; min-width: 720px; padding-top: 10px; border-top: 1px solid #ebebe7;">
+        <sc-for list="{{months}}" as="m" hint-placeholder-count="13">
+          <span style="flex: 1 1 0; min-width: 0; text-align: center; font-size: 12px; color: #3d4048; white-space: pre-line; line-height: 1.3;">{{m.label}}</span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <sc-for list="{{milestones}}" as="s" hint-placeholder-count="3">
+        <span style="border-radius: 999px; background: #f4f4f1; padding: 8px 14px; font-size: 13px; color: #3d4048;">{{s.label}} <span style="font-weight: 600; color: #1f2a4d;">{{s.v}} РУ</span></span>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="border-radius: 24px; background: #ffffff; padding: 28px 32px; display: flex; flex-direction: column; gap: 22px;">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #16181d;">Укладываемся ли в план</h2>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 20px;">
+      <span style="font-size: 44px; font-weight: 600; letter-spacing: -0.04em; line-height: 1; color: #1f2a4d;">{{planDone}} <span style="font-size: 22px; color: #9a9da4;">из {{planTotal}}</span></span>
+      <span style="font-size: 15px; color: #3d4048; line-height: 1.45; max-width: 520px;">{{planText}}</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px; border-top: 1px solid #f1f1ee; padding-top: 20px;">
+      <span style="font-size: 14px; font-weight: 500;">Сколько длится каждый этап (медиана, дней)</span>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+        <sc-for list="{{spans}}" as="t" hint-placeholder-count="4">
+          <div style="border-radius: 16px; background: #f4f4f1; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: #1f2a4d; line-height: 1;">{{t.med}}</span>
+            <span style="font-size: 13px; color: #3d4048; line-height: 1.35;">{{t.label}}</span>
+            <span style="font-size: 12px; color: #6b6f78;">среднее {{t.avg}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-radius: 24px; background: #ffffff; padding: 28px 32px; display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px;">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: #16181d;">Что мешает</h2>
+      <span style="font-size: 12px; color: #6b6f78;">По плану от 14.05.2026 уже должны были быть поданы, но в ГНЦЛ ещё не поданы. Справа — сколько дней прошло после плановой даты</span>
+    </div>
+    <sc-if value="{{hasLate}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; flex-direction: column;">
+        <sc-for list="{{late}}" as="l" hint-placeholder-count="9">
+          <div style="display: grid; grid-template-columns: 280px minmax(0, 1fr) 110px; align-items: center; gap: 16px; padding: 12px 0; border-top: 1px solid #f1f1ee;">
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-size: 14px; font-weight: 600;">{{l.n}}</span><span style="font-size: 12px; color: #6b6f78;">{{l.spec}}</span></span>
+            <span style="font-size: 13px; color: #3d4048; line-height: 1.4;">{{l.why}}</span>
+            <span style="justify-self: end; font-size: 12px; font-weight: 600; color: {{l.color}}; background: {{l.chip}}; border-radius: 999px; padding: 5px 12px; white-space: nowrap;">{{l.days}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{noLate}}" hint-placeholder-val="{{false}}">
+      <span style="font-size: 14px; color: #3d4048;">В этой категории всё подаётся по плану.</span>
+    </sc-if>
+    <div style="border-radius: 16px; background: #f4f4f1; padding: 14px 18px; display: flex; flex-direction: column;">
+      <button type="button" onClick="{{openStop}}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 0; background: transparent; padding: 0; cursor: pointer; text-align: left; color: #16181d;">
+        <span style="font-size: 14px; font-weight: 500;">Остановлено: {{stopCount}}</span>
+        <span style="font-size: 13px; font-weight: 500; color: #2f56a8;">{{stopBtn}}</span>
+      </button>
+    </div>
+  </section>
+
+</div>
+</div>
+<sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+  <div style="position: fixed; inset: 0; z-index: 50; display: flex; justify-content: flex-end;">
+    <button type="button" aria-label="Закрыть список" onClick="{{closeDrawer}}" style="position: absolute; inset: 0; border: 0; padding: 0; background: rgba(22, 24, 29, 0.28); cursor: pointer;"></button>
+    <aside aria-label="{{drawerTitle}}" style="position: relative; width: 480px; max-width: 100%; height: 100%; background: #ffffff; box-shadow: -16px 0 48px rgba(22, 24, 29, 0.16); display: flex; flex-direction: column; font-family: 'Onest', system-ui, sans-serif; color: #16181d; font-variant-numeric: tabular-nums;">
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: 26px 28px 18px; border-bottom: 1px solid #f1f1ee;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.015em;">{{drawerTitle}}</span>
+            <span style="font-size: 13px; color: #6b6f78;">{{drawerSub}}</span>
+          </div>
+          <button type="button" onClick="{{closeDrawer}}" aria-label="Закрыть" style="flex: none; width: 36px; height: 36px; border-radius: 99px; border: 0; background: #f4f4f1; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3d4048" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          </button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+          <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5d616a;"><span style="width: 8px; height: 8px; border-radius: 99px; background: #1f2a4d;"></span>Лекарство</span>
+          <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5d616a;"><span style="width: 8px; height: 8px; border-radius: 99px; background: #9cc63a;"></span>БАД</span>
+          <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5d616a;"><span style="width: 8px; height: 8px; border-radius: 99px; background: #8fa3d9;"></span>Медизделие</span>
+        </div>
+      </div>
+      <div style="flex: 1; overflow-y: auto; padding: 8px 28px 28px; display: flex; flex-direction: column; gap: 18px;">
+        <sc-for list="{{dGroups}}" as="g" hint-placeholder-count="3">
+          <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 12px 0 6px;">
+              <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #6b6f78;">{{g.title}}</span>
+              <span style="font-size: 12px; color: #8a8e96;">{{g.count}}</span>
+            </div>
+            <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column; border-top: 1px solid #f1f1ee;">
+                <button type="button" onClick="{{r.toggle}}" aria-expanded="{{r.open}}" style="display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 16px; align-items: center; gap: 12px; padding: 12px 6px; margin: 0 -6px; border: 0; border-radius: 10px; background: {{r.bg}}; cursor: pointer; text-align: left; color: #16181d; font-family: inherit;">
+                  <span style="width: 8px; height: 8px; border-radius: 99px; background: {{r.dot}};"></span>
+                  <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                    <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600;">{{r.n}}<sc-if value="{{r.multi}}" hint-placeholder-val="{{false}}"><span style="border-radius: 999px; background: #f1f1ee; padding: 1px 7px; font-size: 11px; font-weight: 600; color: #5d616a;">×{{r.k}}</span></sc-if></span>
+                    <span style="font-size: 12px; color: #6b6f78;">{{r.meta}}</span>
+                  </span>
+                  <span style="font-size: 13px; font-weight: 600; color: #1f2a4d; white-space: nowrap;">{{r.date}}</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8a8e96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: {{r.rot}};"><path d="m9 6 6 6-6 6"></path></svg>
+                </button>
+                <sc-if value="{{r.open}}" hint-placeholder-val="{{false}}">
+                  <div style="display: flex; flex-direction: column; gap: 10px; margin: 0 0 12px 22px; padding: 12px 14px; border-radius: 12px; background: #f4f4f1;">
+                    <span style="display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 11px; color: #8a8e96; text-transform: uppercase; letter-spacing: 0.06em;">МНН</span><span style="font-size: 12px; color: #3d4048; line-height: 1.45;">{{r.mnn}}</span></span>
+                    <span style="display: flex; flex-direction: column; gap: 6px;"><span style="font-size: 11px; color: #8a8e96; text-transform: uppercase; letter-spacing: 0.06em;">Дозировка и упаковка</span>
+                      <span style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <sc-for list="{{r.vars}}" as="v" hint-placeholder-count="2">
+                          <span style="border-radius: 8px; background: #ffffff; padding: 5px 9px; font-size: 12px; color: #3d4048; line-height: 1.35;">{{v}}</span>
+                        </sc-for>
+                      </span>
+                    </span>
+                    <sc-if value="{{r.hasNote}}" hint-placeholder-val="{{false}}">
+                      <span style="font-size: 12px; color: #a8352c; line-height: 1.4;">{{r.note}}</span>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <sc-if value="{{drawerEmpty}}" hint-placeholder-val="{{false}}">
+          <p style="margin: 0; padding: 24px 0; font-size: 14px; color: #6b6f78;">В этом месяце РУ не запланированы.</p>
+        </sc-if>
+      </div>
+    </aside>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+const D = [
+["DEXAPAIN", "M", "ЧС", "sub", 0, "25-02-24", "25-03-04", "25-03-15", "25-08-25", "", "26-11-29", "25-10-01", "25-10-16", "25-12-22", "26-01-05", "BALKAN/DISTRIMED", ""],
+["DONEZIL", "M", "ЧС", "sub", 0, "25-03-14", "25-03-17", "25-08-02", "25-11-19", "", "27-02-24", "25-12-11", "25-12-19", "26-05-12", "26-06-09", "NOVELL PHARM", ""],
+["GESTERIOL", "M", "ЧС", "sub", 0, "25-03-14", "25-03-14", "25-04-25", "25-12-17", "", "27-03-21", "26-01-15", "26-01-22", "26-03-13", "26-03-27", "RENATA", ""],
+["FINOTERB 250", "M", "ЧС", "sub", 0, "25-03-14", "25-03-14", "25-05-20", "25-12-17", "", "27-03-21", "26-01-15", "26-01-22", "26-06-02", "26-06-09", "RENATA", ""],
+["EDINAZID", "M", "ЧС", "sub", 0, "25-03-14", "25-03-17", "25-10-20", "25-12-23", "", "27-03-27", "26-01-15", "26-01-22", "26-06-02", "26-06-09", "NOVELL PHARM", ""],
+["ROXIVEN 20", "M", "ЧС", "sub", 0, "25-03-14", "25-03-14", "25-04-20", "26-01-29", "", "27-05-05", "26-03-04", "26-03-27", "26-07-01", "26-07-20", "RENATA", ""],
+["ROXIVEN 10", "M", "ЧС", "sub", 0, "25-03-14", "25-03-14", "25-04-20", "26-01-29", "", "27-05-05", "26-03-04", "26-03-27", "26-07-01", "26-07-20", "RENATA", ""],
+["LACTERIA", "MD", "ЧС", "sub", 0, "25-05-01", "25-05-02", "25-10-01", "26-02-26", "", "27-06-02", "", "", "", "", "CPC 1HN", ""],
+["BERRYLACT EXTRA", "FS", "ЧС", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "KENDY", ""],
+["LACTOSPEY DROPS", "FS", "ЧС", "sub", 0, "24-12-26", "25-01-13", "25-01-31", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "OFI S.P.A.", ""],
+["LACTOSPEY DRINK", "FS", "ЧС", "sub", 0, "24-12-26", "25-01-13", "25-01-31", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "OFI S.P.A.", ""],
+["OSTEOSTRONG", "FS", "ЧС", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "OLIMP LABORATORIES", ""],
+["FERTIVITA", "FS", "ЧС", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "OLIMP LABORATORIES", ""],
+["FERTILIFE", "FS", "ЧС", "sub", 0, "24-05-22", "24-05-30", "24-07-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "OLIMP LABORATORIES", ""],
+["MAGNISPEY", "FS", "ЧС", "sub", 0, "24-05-22", "24-05-30", "24-06-25", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "OLIMP LABORATORIES", ""],
+["PYLOSPEY", "FS", "ЧС", "sub", 0, "24-12-26", "25-01-13", "25-01-16", "26-03-18", "", "26-12-14", "26-03-18", "26-04-14", "", "", "PHARMALINEA", ""],
+["LACTOSPEY ENTERIC ECOL", "FS", "IZ", "sub", 0, "25-09-19", "25-10-03", "26-01-16", "26-05-13", "26-05-30", "27-02-26", "", "", "", "", "KENDY", ""],
+["APITROKSAR 5", "M", "ЧС", "sub", 0, "25-03-14", "25-03-14", "25-04-04", "26-06-04", "26-05-30", "27-09-04", "26-06-19", "26-07-20", "26-07-29", "26-08-14", "RENATA", ""],
+["REGIMED", "M", "ЧС", "sub", 0, "25-02-24", "25-03-04", "", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "BALKAN/DISTRIMED", ""],
+["KORTIPAN", "M", "ЧС", "sub", 0, "25-02-24", "25-03-04", "", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "BALKAN/DISTRIMED", ""],
+["ESCILEKT 20", "M", "ЧС", "sub", 0, "25-03-14", "25-03-17", "25-11-28", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "NOVELL PHARM", ""],
+["ESCILEKT 10", "M", "ЧС", "sub", 0, "25-03-14", "25-03-17", "25-11-28", "26-06-09", "26-05-30", "27-09-04", "26-07-01", "26-07-20", "26-08-28", "26-09-11", "NOVELL PHARM", ""],
+["FERZAPIN 5", "M", "IZ", "sub", 0, "25-11-21", "25-11-24", "26-01-09", "26-06-17", "26-06-10", "27-09-15", "26-06-29", "26-07-13", "26-08-28", "26-09-11", "WHANIN PHARMA", ""],
+["FERZAPIN 10", "M", "IZ", "sub", 0, "25-11-21", "25-11-24", "26-01-09", "26-06-17", "26-06-10", "27-09-15", "26-06-29", "26-07-13", "26-08-28", "26-09-11", "WHANIN PHARMA", ""],
+["PANTOSPEY", "M", "IZ", "sub", 0, "25-11-21", "25-11-24", "26-01-08", "26-06-29", "26-06-10", "27-09-15", "26-07-15", "26-08-03", "", "", "BALKAN/DISTRIMED", ""],
+["LOXICAM", "M", "IZ", "sub", 0, "26-01-07", "26-01-08", "26-01-29", "26-06-30", "26-06-10", "27-09-15", "26-07-15", "26-08-03", "26-09-30", "26-10-08", "BALKAN/DISTRIMED", ""],
+["VEGANEPHRON", "FS", "IZ", "sub", 0, "26-02-25", "26-02-26", "26-06-02", "26-07-10", "26-08-10", "27-05-08", "", "", "", "", "FORTEX", ""],
+["MAGNISPEY BABY", "FS", "IZ", "sub", 0, "26-02-25", "26-02-26", "26-06-02", "26-07-10", "26-08-10", "27-05-08", "", "", "", "", "FORTEX", ""],
+["NEUROCRIN 5", "M", "IZ", "sub", 0, "25-11-21", "25-11-24", "26-01-08", "26-07-13", "26-06-10", "27-09-15", "26-07-24", "26-08-14", "26-09-30", "26-10-08", "BALKAN/DISTRIMED", ""],
+["NEUROCRIN 15", "M", "IZ", "sub", 0, "25-11-21", "25-11-24", "26-01-08", "26-07-13", "26-06-10", "27-09-15", "26-07-24", "26-08-14", "26-09-30", "26-10-08", "BALKAN/DISTRIMED", ""],
+["ERTOFINAN 60", "M", "IZ", "sub", 0, "26-01-07", "26-01-26", "26-03-06", "26-08-14", "26-07-10", "27-10-14", "26-09-02", "26-09-11", "26-10-30", "26-11-04", "ESKAYEF", ""],
+["ERTOFINAN 90", "M", "IZ", "sub", 0, "26-01-07", "26-01-26", "26-03-06", "26-08-14", "26-07-10", "27-10-14", "26-09-02", "26-09-11", "26-10-30", "26-11-04", "ESKAYEF", ""],
+["ERTOFINAN 120", "M", "IZ", "sub", 0, "26-01-07", "26-01-26", "26-03-06", "26-08-14", "26-07-10", "27-10-14", "26-09-02", "26-09-11", "26-10-30", "26-11-04", "ESKAYEF", ""],
+["APITROKSAR 2.5", "M", "ЧС", "sub", 0, "25-03-14", "25-03-14", "25-04-04", "26-08-25", "", "", "26-09-09", "26-09-11", "", "", "RENATA", ""],
+["LEVOSPEY", "M", "IZ", "p09", 0, "26-01-07", "26-01-08", "", "26-10-13", "26-07-10", "27-10-14", "26-10-29", "26-11-04", "", "", "NABIQASIM", ""],
+["VIPLACTIN OPTI", "FS", "IZ", "p09", 0, "26-05-19", "26-05-20", "", "26-11-02", "", "", "", "", "", "", "KENDY", ""],
+["SETIMED", "M", "IZ", "p09", 0, "26-01-07", "26-01-08", "26-01-14", "26-11-05", "26-06-10", "27-09-15", "", "", "", "", "STELLA PHARMA", ""],
+["VEGACEF", "M", "IZ", "p09", 0, "26-01-07", "26-01-08", "26-02-12", "26-11-05", "26-07-10", "27-10-14", "", "", "", "", "NABIQASIM", ""],
+["ZHASMED", "M", "ЧС", "risk", 0, "25-03-14", "25-03-14", "25-05-15", "", "26-05-30", "27-09-04", "", "", "", "", "RENATA", "Завод обещал передать документы до конца июня 2025."],
+["ERGONEX", "M", "IZ", "risk", 0, "25-09-19", "25-09-25", "26-01-15", "", "26-07-10", "27-10-14", "", "", "", "", "RENATA", "Ожидаем РСО и админдоки."],
+["ITOGAST", "M", "IZ", "long", 0, "25-09-19", "25-09-25", "26-01-30", "", "26-07-10", "27-10-14", "", "", "", "", "VELPHARM", "Завод обновляет досье. Досье будет готово к концу 2026 года."],
+["VEGADERM", "M", "IZ", "long", 0, "26-01-07", "26-01-08", "26-02-25", "", "26-08-10", "27-11-14", "", "", "", "", "STELLA PHARMA", "Досье требует доработки. Досье будет готово в апреле 2027."],
+["FOBOS 150", "M", "IZ", "long", 0, "26-01-07", "26-01-08", "26-03-17", "", "26-08-10", "27-11-14", "", "", "", "", "STELLA PHARMA", "Досье требует доработки. Досье будет готово в апреле 2027."],
+["FINOTERB крем", "M", "IZ", "long", 0, "26-01-07", "26-01-08", "26-02-25", "", "26-08-10", "27-11-14", "", "", "", "", "STELLA PHARMA", "Досье требует доработки. Досье будет готово в апреле 2027."],
+["PERMANEO DUAL", "FS", "IZ", "p09", 0, "26-03-02", "26-03-02", "26-06-02", "", "26-08-10", "27-05-08", "", "", "", "", "FORTEX", "В связи с изменением законодательства теперь требуются референс-стандарты."],
+["MYOMEX", "FS", "IZ", "p09", 0, "26-02-25", "26-02-26", "26-06-02", "", "26-08-10", "27-05-08", "", "", "", "", "FORTEX", "Подадим до конца ноября 2026."],
+["IMMUJEN", "FS", "IZ", "risk", 0, "26-02-25", "26-02-26", "26-06-02", "", "26-08-10", "27-05-08", "", "", "", "", "FORTEX", "Нет методики идентификации Вит В4 и Вит В12. Просим снять с работы."],
+["LACTOSPEY KIDS", "FS", "IZ", "stop", 0, "", "", "", "", "", "", "", "", "", "", "KENDY", "Стоп: продукт не зарегистрирован в стране производителя."],
+["SELTOZIDIM 1", "M", "IZ", "stop", 0, "", "", "", "", "", "", "", "", "", "", "ACS DOBFAR", "Продукт остановлен, подавать в Азербайджане не будем."],
+["BERRYLACT KIDS", "FS", "IZ", "stop", 0, "", "", "", "", "", "", "", "", "", "", "BIOFAKTOR", "Стоп: продукт не зарегистрирован в стране производителя."],
+["KEDD", "MD", "ЧС", "stop", 0, "", "", "", "", "", "", "", "", "", "", "CPC 1HN", ""],
+["VOLKRON 5", "M", "IZ", "stop", 0, "", "", "", "", "", "", "", "", "", "", "DONGKOO BIOPHARMA", "Стоп: неполное досье."],
+["VOLKRON 20", "M", "IZ", "stop", 0, "", "", "", "", "", "", "", "", "", "", "DONGKOO BIOPHARMA", "Стоп: неполное досье."],
+["LINDAFER", "M", "IZ", "stop", 0, "", "", "", "", "", "", "", "", "", "", "NABIQASIM", "Стоп: БДМ не смог согласовать цену."],
+["LILAIZ ROSE DOUCHE", "MD", "IZ", "p10", 0, "26-05-26", "26-06-10", "26-06-11", "", "", "", "", "", "", "", "BIODUE", "Подадим до конца ноября 2026."],
+["GINELIFE-L", "M", "IZ", "p11", 0, "26-07-07", "26-07-07", "26-10-06", "", "", "", "", "", "", "", "DROGSAN", "Ждём админдоки, образцы и РСО."],
+["CYCLONORM ALFA", "FS", "IZ", "p11", 0, "26-05-26", "26-06-12", "", "", "", "", "", "", "", "", "LOLI PHARMA", "Ждём админдоки."],
+["NUTRISPEY", "FS", "IZ", "new", 0, "26-10-06", "26-10-12", "", "", "", "", "", "", "", "", "MARTINEZ", "Ждём досье."],
+["FERROSPEY", "M", "IZ", "new", 0, "26-10-28", "26-11-04", "", "", "", "", "", "", "", "", "PHARMADA", ""],
+["DICARD FDP", "M", "IZ", "new", 0, "26-10-28", "26-11-06", "", "", "", "", "", "", "", "", "SINOLEAD", ""],
+["HONDROSPEY", "FS", "IZ", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "FORTEX", ""],
+["FOLENS META", "FS", "IZ", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "FORTEX", ""],
+["DICHOLEK", "FS", "IZ", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "FORTEX", ""],
+["RELASON KIDS", "FS", "IZ", "new", 0, "26-11-04", "", "", "", "", "", "", "", "", "", "FORTEX", ""],
+["SELTOZIDIM 1000", "M", "", "new", 1, "", "", "", "", "", "", "", "", "", "", "SKMP", ""],
+["MEMIBEL-L", "M", "", "new", 1, "", "", "", "", "", "", "", "", "", "", "BLIS", ""],
+["METROVENS GINO", "M", "", "new", 1, "", "", "", "", "", "", "", "", "", "", "BLIS", ""],
+["FOBOS 200", "M", "", "new", 1, "", "", "", "", "", "", "", "", "", "", "OTSUKA", ""],
+["ZOLEOST", "M", "", "new", 1, "", "", "", "", "", "", "", "", "", "", "OTSUKA", ""]
+];
+const INFO = ["DEXKETOPROFEN · SOLUTION", "DONEPEZIL · TABLETS", "DYDROGESTERONE · TABLETS", "TERBINAFINE · TABLETS", "REBAMIPIDE · TABLETS", "RIVAROXABAN · TABLETS", "RIVAROXABAN · TABLETS", "LACTIC ACID · SUPP", "D-MANNOSE + CRANBERRY EXTRACT · SACHET", "LACTOBACILLUS REUTERI · ORAL DRP", "VIT B6 + B2 + B1 + B12 + PP + … · ORAL SOL", "CALCIUM + VIT D3 + … · TABLETS", "L-ARGININE-A-KETOGLUTARATE + COENZYME Q10 + … · SACHET", "L-ARGININE-A-KETOGLUTARATE + L-CARNITINE + … · SACHET", "MAGNESIUM + VITAMIN B6 · CAPSULES", "POLYPASS + BROCCOPHANE · CAPSULES", "SACCHAROMYCES BOULARDII + пробиотики · CAPSULES", "APIXABAN · TC-TAB FC", "THIAMINE + PYRIDOXINE + CYANOCOBALAMIN · INJ", "BETAMETHASONE · AMPOULES", "ESCITALOPRAM · TABLETS", "ESCITALOPRAM · TABLETS", "OLANZAPINE · TABLETS", "OLANZAPINE · TABLETS", "PANTOPRAZOLE · I-LYOPH", "LORNOXICAM · I-AMP", "LESPEDEZA CAPITATE EXTRACT + STAR ANISE · SYR", "MAGNESIUM + VITAMIN B6 · SYR", "IPIDACRINE · INJ", "IPIDACRINE · INJ", "ETORICOXIB · TC-TAB FC", "ETORICOXIB · TC-TAB FC", "ETORICOXIB · TC-TAB FC", "APIXABAN · TC-TAB FC", "LEVOFLOXACIN · I-INF", "LACTOBACILLI + BIFIDOBACTERIA + FOS · TC-CAP", "LEVOCETIRIZINE · TC-TAB FC", "CEFTRIAXONE · I-VIAL", "AZITHROMYCIN · TABLETS", "CABERGOLINE · TABLETS", "ITOPRIDE · TABLETS", "BETAMETHASONE + CLOTRIMAZOLE + GENTAMICIN · CREAM", "FLUCONAZOLE · CAPSULES", "TERBINAFINE · CREAM", "MAGNESIUM + ZINC + PANTOTHENIC ACID + … · CAPSULES", "EPIGALLOCATECHIN 3-GALLATE + … · CAPSULES", "GINSENG + VIT A + COLECALCIFEROL + … · CAPSULES", "SACCHAROMYCES BOULARDII + L. RHAMNOSUS · SACHET", "CEFTAZIDIME · I-INJ", "CRANBERRY + COMBI · SYRUP", "CLINDAMYCIN + CLOTRIMAZOLE · SUPP", "TADALAFIL · TABLETS", "TADALAFIL · TABLETS", "FERRIC SUCROSE COMPLEX · I-AMP", "MAGALDRATE + SODIUM HYALURONATE + ALOE VERA · VG-SOL", "METRONIDAZOLE + MICONAZOLE + LIDOCAINE · VAGINAL TABLETS", "MYO-INOSITOL + SOYBEAN OIL + FOLIC ACID · CAPSULES", "YEAST EXTRACT + L-ARGININE + LYSINE · ORAL AMP", "FERRIC SUCROSE COMPLEX · I-AMP", "FRUCTOSE DIPHOSPHATE · POW. FOR INJ.", "GLUCOSAMINE + MSM + CHONDROITIN · TABS", "VITAMIN B12 + FOLIC ACID · ORAL DROP", "VITAMIN D3 · DROPS", "LINDEN FLOWERS + … · SYR", "CEFTAZIDIME · INJ", "METRONIDAZOLE + MICONAZOLE + LIDOCAINE · VG-SUPP", "METRONIDAZOLE + NEOMYCIN + NYSTATIN · VG-SUPP", "FLUCONAZOLE · I-INF", "ZOLEDRONIC ACID · I-INF"];
+const DP = [["25 MG / ML", "5 * 2 ML"], ["5 MG", "30"], ["10 MG", "2 X 10"], ["250 MG", "14"], ["100 mg", "30"], ["20 MG", "28"], ["10 MG", "3 X 10"], ["40 MG", "7"], ["2000 MG + 200 MG + 70 MG + 3.4 MG", "14"], ["108 CFU (100 MLN) 0.005 G", "10 ML"], ["0.6 MG + 0.48 MG + 0.42 MG + 2 M …", "10"], ["500 MG + 5 MG + 1 MG + 5 UQ + 37 …", "60"], ["6150 MG + 10 MG + 600 MG + 60 MG …", "15"], ["6150 MG + 900 MG + 100 MG + 1 MG …", "15"], ["100 MG + 2.1 MG", "30"], ["200 MG + 75 MG", "30"], ["250.0 MG + 125.0 MG + 25.0 MG", "10"], ["5 MG", "30"], ["50 MG + 50 MG + 0.5 MG / ML", "5 * 2 ML"], ["5 MG + 2 MG / 1 ML", "1"], ["20 MG", "30"], ["10 MG", "30"], ["5 MG", "28"], ["10 MG", "28"], ["40MG", "10"], ["8 MG / 2 ML", "5"], ["15 ML / 100 ML + 0.1 ML / 100 ML", "100 ML"], ["29.8 MG / 5 ML + 1.2 MG / 5 ML", "150 ML"], ["5 MG / ML", "10"], ["15 MG / ML", "10 * 1 ML"], ["60мг", "30"], ["90мг", "30"], ["120мг", "30"], ["2.5 MG", "30"], ["500 мг/100 мл", "1"], ["300+300+50mg", "30"], ["5 MG", "5х10"], ["1000mg", "1"], ["500 MG", "1 X 3"], ["0.5 MG", "8"], ["50 MG", "40"], ["6.4 MG + 100 MG + 10 MG", "10G"], ["150 MG", "1"], ["0.01", "10G"], ["1 capsule: (56,5 mg + 2,5 mg + 1 …", "30 + 30"], ["61.75 MG + 16.25 MG + 13 MG + 9. …", "60"], ["42.5 MG + 2500 IU + 200 IU + 2 M …", "30"], ["1.25 MLD CFU + 3 MLD CFU + 25 MG", "10"], ["1 G", "1"], ["///", "150ml"], ["100 MG + 100 MG", "7"], ["5 MG", "28"], ["20 MG", "4"], ["100mg/5ml", "5"], ["100 ml", "№4"], ["750 + 200 + 100", "7"], ["550 MG + /// + 0.24 MG", "30"], ["20 mg + 1000 mg + 200 mg + 1,5 m …", "10ml*10"], ["100mg/5ml", "5"], ["5 G", "1 vial + 1 amp. of solvent"], ["500 mg + 300 mg + 200 mg + 6,7 m …", "30"], ["3 mcg/ml + 400 mcg/ml", "30ml"], ["15000 IU/ml", "20ml"], ["2.295 G + 2.228 G + 2.228 G + 1. …", "150 ML"], ["1000mg", "15 ml"], ["750mg+200mg+100mln", "1x7"], ["500mg+65,000+100,000 IU", "2x5"], ["200mg/100ml", "100mlx1, Glass bottle"], ["4mg/100 ml", "100mlx1, Non PVC Bag"]];
+const MNN = ["DEXKETOPROFEN", "DONEPEZIL", "DYDROGESTERONE", "TERBINAFINE", "REBAMIPIDE", "RIVAROXABAN", "RIVAROXABAN", "LACTIC ACID", "D-MANNOSE + CRANBERRY EXTRACT", "LACTOBACILLUS REUTERI", "VIT B6 + B2 + B1 + B12 + PP + …", "CALCIUM + VIT D3 + …", "L-ARGININE-A-KETOGLUTARATE + COENZYME Q10 + …", "L-ARGININE-A-KETOGLUTARATE + L-CARNITINE + …", "MAGNESIUM + VITAMIN B6", "POLYPASS + BROCCOPHANE", "SACCHAROMYCES BOULARDII + пробиотики", "APIXABAN", "THIAMINE + PYRIDOXINE + CYANOCOBALAMIN", "BETAMETHASONE", "ESCITALOPRAM", "ESCITALOPRAM", "OLANZAPINE", "OLANZAPINE", "PANTOPRAZOLE", "LORNOXICAM", "LESPEDEZA CAPITATE EXTRACT + STAR ANISE", "MAGNESIUM + VITAMIN B6", "IPIDACRINE", "IPIDACRINE", "ETORICOXIB", "ETORICOXIB", "ETORICOXIB", "APIXABAN", "LEVOFLOXACIN", "LACTOBACILLI + BIFIDOBACTERIA + FOS", "LEVOCETIRIZINE", "CEFTRIAXONE", "AZITHROMYCIN", "CABERGOLINE", "ITOPRIDE", "BETAMETHASONE + CLOTRIMAZOLE + GENTAMICIN", "FLUCONAZOLE", "TERBINAFINE", "MAGNESIUM + ZINC + PANTOTHENIC ACID + …", "EPIGALLOCATECHIN 3-GALLATE + …", "GINSENG + VIT A + COLECALCIFEROL + …", "SACCHAROMYCES BOULARDII + L. RHAMNOSUS", "CEFTAZIDIME", "CRANBERRY + COMBI", "CLINDAMYCIN + CLOTRIMAZOLE", "TADALAFIL", "TADALAFIL", "FERRIC SUCROSE COMPLEX", "MAGALDRATE + SODIUM HYALURONATE + ALOE VERA", "METRONIDAZOLE + MICONAZOLE + LIDOCAINE", "MYO-INOSITOL + SOYBEAN OIL + FOLIC ACID", "YEAST EXTRACT + L-ARGININE + LYSINE", "FERRIC SUCROSE COMPLEX", "FRUCTOSE DIPHOSPHATE", "GLUCOSAMINE + MSM + CHONDROITIN", "VITAMIN B12 + FOLIC ACID", "VITAMIN D3", "LINDEN FLOWERS + …", "CEFTAZIDIME", "METRONIDAZOLE + MICONAZOLE + LIDOCAINE", "METRONIDAZOLE + NEOMYCIN + NYSTATIN", "FLUCONAZOLE", "ZOLEDRONIC ACID"];
+const tmOf = (n) => n.replace(/\s+(\d[\d.,]*( G)?|крем|инфузия)$/, '');
+const TODAY = '26-11-13';
+const MON = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const P = (r) => ({ n: r[0], cat: r[1], g: r[3], mfg: r[15], task: r[5], zd: r[6], ad: r[7], pd: r[8], mpl: r[9], plru: r[10], pei: r[11], pep: r[12], sei: r[13], sep: r[14], why: r[16] });
+const ALL = D.map((r, i) => ({ ...P(r), tm: tmOf(r[0]), info: INFO[i], mnnFull: MNN[i], dose: DP[i][0], pack: DP[i][1] }));
+const ms = (s) => new Date('20' + s).getTime();
+const days = (a, b) => Math.round((ms(b) - ms(a)) / 864e5);
+function median(v) {
+  if (!v.length) return null;
+  const x = v.slice().sort((a, b) => a - b);
+  const m = Math.floor(x.length / 2);
+  return Math.round(x.length % 2 ? x[m] : (x[m - 1] + x[m]) / 2);
+}
+const avg = (v) => (v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null);
+function spanOf(rows, pairs) {
+  const v = [];
+  rows.forEach((r) => pairs.forEach(([a, b]) => {
+    if (r[a] && r[b]) { const d = days(r[a], r[b]); if (d >= 0) v.push(d); }
+  }));
+  return v;
+}
+const plural = (n, a, b, c) => {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return a;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return b;
+  return c;
+};
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'all', month: null, drawer: null, exp: {} };
+  }
+
+  drawerVals(drawer, month, planned, stops, monthTitle) {
+    const close = () => this.setState({ drawer: null, month: null, exp: {} });
+    const off = { drawerOpen: false, drawerTitle: '', drawerSub: '', dGroups: [], drawerEmpty: false, closeDrawer: close };
+    if (!drawer) return off;
+    const exp = this.state.exp || {};
+    const DOT = { M: '#1f2a4d', FS: '#9cc63a', MD: '#8fa3d9' };
+    const fmtD = (s) => s.slice(6, 8) + '.' + s.slice(3, 5);
+    const rows = drawer === 'month'
+      ? planned.filter((r) => r.plru.slice(0, 5) === month)
+      : stops;
+    const groupKey = (r) => (drawer === 'month' ? r.mfg : r.why);
+    const order = [];
+    const groups = {};
+    rows.slice().sort((a, b) => (a.plru || '').localeCompare(b.plru || '')).forEach((r) => {
+      const gk = groupKey(r);
+      if (!groups[gk]) { groups[gk] = {}; order.push(gk); }
+      const form = r.info.slice(r.info.lastIndexOf(' · ') + 3);
+      const ik = r.tm + '|' + form + '|' + r.mfg;
+      if (!groups[gk][ik]) groups[gk][ik] = { r, form, vars: [] };
+      groups[gk][ik].vars.push(r.dose + ' · уп. ' + r.pack);
+    });
+    const dGroups = order.map((gk) => {
+      const items = Object.keys(groups[gk]).map((ik) => {
+        const it = groups[gk][ik];
+        const key = drawer + '|' + gk + '|' + ik;
+        const open = !!exp[key];
+        return {
+          n: it.r.tm, k: it.vars.length, multi: it.vars.length > 1,
+          meta: drawer === 'month' ? it.form : it.r.mfg + ' · ' + it.form,
+          date: drawer === 'month' ? fmtD(it.r.plru) : '',
+          dot: DOT[it.r.cat] || '#c9cbd0', mnn: it.r.mnnFull, vars: it.vars,
+          hasNote: false, note: '',
+          open, bg: open ? '#f8f8f6' : 'transparent', rot: open ? 'rotate(90deg)' : 'none',
+          toggle: () => this.setState({ exp: { ...exp, [key]: !open } })
+        };
+      });
+      const n = items.reduce((a, b) => a + b.k, 0);
+      return { title: gk, count: n + ' ' + plural(n, 'позиция', 'позиции', 'позиций'), rows: items };
+    });
+    const brands = dGroups.reduce((a, g) => a + g.rows.length, 0);
+    if (drawer === 'month') {
+      return {
+        drawerOpen: true, drawerTitle: monthTitle.split(' · ')[0],
+        drawerSub: rows.length + ' РУ · ' + brands + ' ' + plural(brands, 'препарат', 'препарата', 'препаратов') + ' · ' + dGroups.length + ' ' + plural(dGroups.length, 'производитель', 'производителя', 'производителей'),
+        dGroups, drawerEmpty: rows.length === 0, closeDrawer: close
+      };
+    }
+    return {
+      drawerOpen: true, drawerTitle: 'Остановленные позиции',
+      drawerSub: rows.length + ' позиций · в цифры дашборда не входят',
+      dGroups, drawerEmpty: false, closeDrawer: close
+    };
+  }
+
+  renderVals() {
+    const { cat, month, drawer } = this.state;
+    const scoped = ALL.filter((r) => cat === 'all' || r.cat === cat);
+    const act = scoped.filter((r) => r.g !== 'stop');
+    const sub = act.filter((r) => r.pd);
+
+    const catBtns = [['all', 'Все'], ['M', 'Лекарства'], ['FS', 'БАДы'], ['MD', 'Медизделия']].map(([v, label]) => {
+      const on = cat === v;
+      return { label, on, bg: on ? '#16181d' : 'transparent', fg: on ? '#ffffff' : '#5d616a', pick: () => this.setState({ cat: v, month: null, drawer: null }) };
+    });
+
+    const ru26 = act.filter((r) => r.plru && r.plru > TODAY && r.plru < '27').length;
+    const ru27 = act.filter((r) => r.plru && r.plru >= '27' && r.plru < '28').length;
+    const kpis = [
+      { v: act.length, label: 'позиций в работе', color: '#ffffff', line: 'rgba(255,255,255,0.18)' },
+      { v: sub.length, label: 'подано в Минздрав', color: '#c8f04b', line: '#c8f04b' },
+      { v: ru26, label: 'РУ до конца 2026', color: '#ffffff', line: 'rgba(255,255,255,0.18)' },
+      { v: ru27, label: 'РУ в 2027 году', color: '#ffffff', line: 'rgba(255,255,255,0.18)' }
+    ];
+    const FK = ['task', 'zd', 'ad', 'pd', 'pep', 'sep'];
+    const reachedOf = (r) => {
+      let top = 0;
+      FK.forEach((k, i) => { if (r[k]) top = i; });
+      return top;
+    };
+    const fLabels = ['Задача получена', 'Досье запрошено у завода', 'Досье проанализировано', 'Подано в Минздрав', 'Оплачена первичная экспертиза', 'Оплачена специализированная экспертиза', 'РУ получено'];
+    const tops = act.map(reachedOf);
+    const funnel = fLabels.map((label, i) => {
+      const reached = i === 6 ? 0 : tops.filter((t) => t >= i).length;
+      const now = i === 6 ? 0 : tops.filter((t) => t === i).length;
+      return {
+        label, reached, now,
+        w: act.length ? Math.round((reached / act.length) * 100) : 0,
+        bg: i >= 3 ? '#1f2a4d' : '#8fa3d9',
+        nowColor: now ? '#16181d' : '#9a9da4'
+      };
+    });
+
+    const planned = act.filter((r) => r.plru);
+    const keys = [];
+    for (let y = 26, m = 11; ; m += 1) {
+      if (m > 12) { m = 1; y += 1; }
+      keys.push({ k: y + '-' + String(m).padStart(2, '0'), y, m });
+      if (y === 27 && m === 11) break;
+    }
+    const mCounts = keys.map((x) => planned.filter((r) => r.plru.slice(0, 5) === x.k).length);
+    const mMax = Math.max(1, ...mCounts);
+    const MONF = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+    const months = keys.map((x, i) => {
+      const on = month === x.k;
+      return {
+        on, txt: mCounts[i] || '',
+        h: mCounts[i] ? Math.max(8, Math.round((mCounts[i] / mMax) * 140)) : 3,
+        bg: on ? '#16181d' : (mCounts[i] ? (x.y === 26 ? '#1f2a4d' : '#c8f04b') : '#ebebe7'),
+        colBg: on ? '#f4f4f1' : 'transparent',
+        label: MON[x.m - 1] + (x.m === 1 || i === 0 ? '\n20' + x.y : ''),
+        aria: MONF[x.m - 1] + ' 20' + x.y + ': ' + mCounts[i] + ' РУ',
+        pick: () => this.setState({ month: x.k, drawer: 'month' })
+      };
+    });
+    let monthTitle = '', monthItems = [];
+    if (month) {
+      const x = keys.find((k) => k.k === month);
+      monthItems = planned.filter((r) => r.plru.slice(0, 5) === month);
+      const name = MONF[x.m - 1];
+      monthTitle = name.charAt(0).toUpperCase() + name.slice(1) + ' 20' + x.y + ' · ' + monthItems.length + ' РУ по плану';
+    }
+    const upTo = (k) => planned.filter((r) => r.plru.slice(0, 5) <= k).length;
+    const milestones = [
+      { label: 'К концу 2026:', v: upTo('26-12') },
+      { label: 'К середине 2027:', v: upTo('27-06') },
+      { label: 'К концу ноября 2027:', v: upTo('27-11') }
+    ];
+
+    const inPlan = act.filter((r) => r.mpl);
+    const done = inPlan.filter((r) => r.pd);
+    const delays = done.map((r) => days(r.mpl, r.pd));
+    const onTime = delays.filter((d) => d <= 0).length;
+    const md = median(delays.filter((d) => d > 0));
+    let planText = 'В майском плане нет позиций этой категории.';
+    if (inPlan.length) {
+      planText = 'позиций из майского плана уже подано. В срок или раньше: ' + onTime + '. С опозданием: ' + (done.length - onTime)
+        + (md !== null ? ', медиана опоздания ' + md + ' ' + plural(md, 'день', 'дня', 'дней') : '')
+        + '. Не подано: ' + (inPlan.length - done.length) + '.';
+    }
+
+    const spanDefs = [
+      ['от задачи до запроса досье', [['task', 'zd']]],
+      ['от запроса до анализа досье', [['zd', 'ad']]],
+      ['от анализа досье до подачи', [['ad', 'pd']]],
+      ['от инвойса до оплаты', [['pei', 'pep'], ['sei', 'sep']]]
+    ];
+    const spans = spanDefs.map(([label, pairs]) => {
+      const v = spanOf(act, pairs);
+      return { label, med: median(v) ?? '—', avg: avg(v) ?? '—' };
+    });
+
+    const late = act.filter((r) => r.mpl && !r.pd && r.mpl < TODAY)
+      .sort((a, b) => a.mpl.localeCompare(b.mpl))
+      .map((r) => {
+        const d = days(r.mpl, TODAY);
+        return { n: r.tm, spec: r.mfg + ' · ' + r.info, why: r.why, days: '+' + d + ' ' + plural(d, 'день', 'дня', 'дней'), color: d > 90 ? '#a8352c' : '#6b4e00', chip: d > 90 ? '#fbe4e1' : '#fbf1d6' };
+      });
+    const stops = scoped.filter((r) => r.g === 'stop');
+
+    return {
+      catBtns, kpis, funnel,
+      months, milestones, noPlan: act.length - planned.length,
+      planDone: done.length, planTotal: inPlan.length, planText, spans,
+      late, hasLate: late.length > 0, noLate: late.length === 0,
+      stopCount: stops.length,
+      openStop: () => this.setState({ drawer: 'stop', month: null }),
+      stopBtn: 'Открыть список',
+      ...this.drawerVals(drawer, month, planned, stops, monthTitle)
+    };
+  }
+}
+</script>
+</body>
+</html>

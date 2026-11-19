@@ -1,0 +1,268 @@
+@import "tailwindcss" source("./");
+@import "./theme.css";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --ui-zoom: 0.9;
+  --screen-h: calc(100vh / var(--ui-zoom));
+}
+html {
+  zoom: var(--ui-zoom);
+}
+/* На телефоне мелкий масштаб только мешает читать. Граница — md из
+   Tailwind (48rem); та же константа в hooks/useIsMobile.ts. */
+@media (max-width: 767.98px) {
+  :root {
+    --ui-zoom: 1;
+  }
+}
+
+#root {
+  min-height: var(--screen-h);
+}
+
+@layer base {
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--color-accent-hover);
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d6d1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b5b8be;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+@layer base {
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline-offset: 0;
+  }
+}
+
+.tr-soft {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+@keyframes drop {
+  from {
+    opacity: 0;
+    translate: 0 -8px;
+  }
+}
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    translate: 48px 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+@keyframes sheet-up {
+  from {
+    translate: 0 100%;
+  }
+}
+@keyframes toast-up {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+
+.anim-head {
+  animation: drop 700ms var(--ease-out-soft) backwards;
+}
+.anim-rise {
+  animation: rise 900ms var(--ease-out-soft) backwards;
+  animation-delay: calc(120ms + 90ms * var(--i, 0));
+}
+.anim-tab {
+  animation: rise 650ms var(--ease-out-soft) backwards;
+  animation-delay: calc(70ms * var(--i, 0));
+}
+.anim-panel {
+  animation: panel-in 480ms var(--ease-out-soft) backwards;
+}
+.anim-sheet {
+  animation: sheet-up 320ms var(--ease-out-soft) backwards;
+}
+.anim-overlay {
+  animation: fade-in 320ms ease backwards;
+}
+.anim-pop {
+  animation: pop-in 220ms var(--ease-out-soft) backwards;
+}
+.anim-toast {
+  animation: toast-up 420ms var(--ease-out-soft) backwards;
+}
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Браузерные поверхности, которые по умолчанию принадлежат не дизайн-системе,
+   а браузеру: каретка, выделение, фокус. */
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-fg);
+}
+input,
+textarea {
+  caret-color: var(--color-accent);
+}
+
+/* Автозаполнение Chrome красит поле своим жёлтым поверх любого фона и
+   ломает вёрстку у всех, у кого сохранён пароль. Перебивается только
+   внутренней тенью: background-color автозаполнение игнорирует. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: inset 0 0 0 1000px var(--color-surface);
+  -webkit-text-fill-color: var(--color-fg);
+  caret-color: var(--color-accent);
+  transition: background-color 9999s ease-out;
+}
+
+.anim-seq > :nth-child(1) {
+  --i: 0;
+}
+.anim-seq > :nth-child(2) {
+  --i: 1;
+}
+.anim-seq > :nth-child(3) {
+  --i: 2;
+}
+.anim-seq > :nth-child(4) {
+  --i: 3;
+}
+.anim-seq > :nth-child(5) {
+  --i: 4;
+}
+.anim-seq > :nth-child(6) {
+  --i: 5;
+}
+.anim-seq > :nth-child(7) {
+  --i: 6;
+}
+.anim-seq > :nth-child(8) {
+  --i: 7;
+}
+.anim-seq > :nth-child(9) {
+  --i: 8;
+}
+.anim-seq > :nth-child(10) {
+  --i: 9;
+}
+.anim-seq > :nth-child(n + 11) {
+  --i: 10;
+}
+.anim-seq > * {
+  transition: opacity 0.2s ease;
+}
+.page-dim > :not(:first-child) {
+  opacity: 0.55;
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+main [style*="width:"][style*="%"]:empty,
+main [style*="flex-grow"]:empty {
+  transform-origin: left center;
+  animation: grow-x 900ms var(--ease-out-soft) backwards;
+  animation-delay: calc(360ms + 90ms * var(--i, 0));
+}
+main [style*="height:"][style*="%"]:empty,
+main .bar-y:empty {
+  transform-origin: center bottom;
+  animation: grow-y 900ms var(--ease-out-soft) backwards;
+  animation-delay: calc(360ms + 90ms * var(--i, 0));
+}

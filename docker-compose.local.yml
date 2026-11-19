@@ -1,0 +1,23 @@
+name: evodash-local
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    init: true
+    environment:
+      TZ: ${TZ:-Europe/Moscow}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      COOKIE_SECURE: "false"
+    volumes:
+      - ./backend/data:/app/backend/data
+
+  web:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "${LOCAL_PORT:-8090}:80"
