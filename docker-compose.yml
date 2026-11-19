@@ -29,22 +29,12 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+    networks:
+      default:
+      edge:
+        aliases:
+          - evodash-web
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    environment:
-      DOMAIN: ${DOMAIN:?задайте DOMAIN в .env}
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - web
-
-volumes:
-  caddy_data:
-  caddy_config:
+networks:
+  edge:
+    external: true
