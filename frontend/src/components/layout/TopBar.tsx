@@ -58,7 +58,7 @@ export default function TopBar() {
         aria-label="EvoDash — к списку рынков"
         className="tr-soft flex h-12 items-center rounded-2xl bg-ink px-4 hover:bg-ink-hover"
       >
-        <Logo />
+        <Logo compact />
       </NavLink>
       {code && (
         <nav
