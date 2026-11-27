@@ -73,12 +73,11 @@ COMMENTS = (
     ("comment_iz", "Комментарии ИЗ и ЧС"),
     ("comment_bdm", "Комментарии БДМ"),
 )
-VIEWS = (*st.GROUP_KEYS, "stop", "red_cycle", "red_ru", "check")
+VIEWS = (*st.GROUP_KEYS, "stop", "red_cycle", "red_ru")
 MONTHS_AHEAD = 13
 OVERDUE = "overdue"
 NO_REASON = "Без комментария"
 NO_MANAGER = "Без менеджера"
-CHECKS_PREVIEW = 6
 
 
 @dataclass
@@ -621,7 +620,7 @@ def _check_rows(evs: list[Ev]) -> list[dict]:
     for e in evs:
         for check in e.checks:
             rows.append({
-                "id": e.item.id, "tm": e.item.tm, "sub": _sub(e.item),
+                "tm": e.item.tm, "sub": _sub(e.item),
                 "manager": e.manager, "sheet": e.item.sheet,
                 "row": e.item.row_no, **check,
             })
@@ -662,7 +661,6 @@ def overview(items: list[Item], s: Settings, sc: Scope) -> dict:
     scoped = scope(items, sc)
     evs = _evs(scoped, s)
     active = [e for e in evs if not e.stop]
-    checks = _check_rows(active)
     return {
         "today": s.today.isoformat(),
         "split": s.split,
@@ -678,7 +676,6 @@ def overview(items: list[Item], s: Settings, sc: Scope) -> dict:
         "durations": _durations([e.item for e in active]),
         "ru_due": _ru_due(active),
         "funnel": _funnel(active),
-        "checks": {"count": len(checks), "items": checks[:CHECKS_PREVIEW]},
         "months": _months(active, s),
         "stopped": sum(e.stop for e in evs),
     }
@@ -688,10 +685,6 @@ def checks(items: list[Item], s: Settings, sc: Scope) -> dict:
     active = [e for e in _evs(scope(items, sc), s) if not e.stop]
     rows = _check_rows(active)
     return {"count": len(rows), "items": rows}
-
-
-def check_count(items: list[Item], s: Settings) -> int:
-    return checks(items, s, Scope())["count"]
 
 
 def _variant(e: Ev) -> dict:
@@ -799,8 +792,6 @@ def _in_view(e: Ev, view: str) -> bool:
         return e.cycle.tone == RED
     if view == "red_ru":
         return not e.ru.got and e.ru.tone == RED
-    if view == "check":
-        return bool(e.checks)
     return not view or e.group == view
 
 
@@ -884,7 +875,6 @@ def product(item: Item, s: Settings) -> dict:
             (lbl for c, _, lbl in st.BY_DATE if c == e.status.by_date),
             None,
         ),
-        "issues": e.checks,
         "shift": shift,
         "ru_term": s.norms.ru(item.category),
         "steps": _steps(e, s),

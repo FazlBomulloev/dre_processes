@@ -5,9 +5,10 @@ from dataclasses import fields
 from sqlalchemy import delete, func, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.models import Import, RgsItem, RgsPlanMove
+from backend.models import Import, Market, RgsItem, RgsPlanMove
 from backend.services.rgs import analytics as an
 from backend.services.rgs.history import plan_moves, snapshot_date
+from backend.services.rgs.settings import import_report, settings
 
 log = logging.getLogger(__name__)
 
@@ -101,3 +102,32 @@ async def backfill_moves(db: AsyncSession) -> int:
         await db.commit()
         log.info("RGS: восстановлено переносов плана подачи: %d", total)
     return total
+
+
+async def attach_checks(
+    db: AsyncSession, market: Market, imp: Import,
+) -> int:
+    s = settings(market, imp, imp.uploaded_at.date())
+    found = an.checks(await load_items(db, imp.id), s, an.Scope())
+    report = import_report(imp)
+    report["checks"] = found
+    imp.report_json = json.dumps(report, ensure_ascii=False, default=str)
+    return found["count"]
+
+
+async def backfill_checks(db: AsyncSession) -> int:
+    rows = (await db.execute(
+        select(Import, Market)
+        .join(Market, Market.id == Import.market_id)
+        .where(Import.kind == "rgs")
+    )).all()
+    done = 0
+    for imp, market in rows:
+        if "checks" in import_report(imp):
+            continue
+        await attach_checks(db, market, imp)
+        done += 1
+    if done:
+        await db.commit()
+        log.info("RGS: добавлены проверки данных в отчёты загрузок: %d", done)
+    return done

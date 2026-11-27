@@ -1,6 +1,5 @@
 import asyncio
 import io
-import json
 import logging
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -164,13 +163,6 @@ def _overview(t: Tracker, sc: an.Scope = an.Scope()):
     )
 
 
-def _checks(t: Tracker, sc: an.Scope = an.Scope()):
-    return cached(
-        CACHE, t.key("checks", sc),
-        lambda: an.checks(t.items, t.settings, sc),
-    )
-
-
 def _stops(t: Tracker, sc: an.Scope = an.Scope()):
     return cached(
         CACHE, t.key("stops", sc),
@@ -200,7 +192,7 @@ async def warm(
             t = await load(db, market, own)
             if t is None:
                 break
-            for job in (_overview(t), _products(t), _stops(t), _checks(t)):
+            for job in (_overview(t), _products(t), _stops(t)):
                 await job
                 done += 1
     return done
@@ -225,7 +217,6 @@ async def meta(
         "rows": imp.rows,
         "file_name": imp.file_name,
         "uploaded_at": imp.uploaded_at.isoformat(),
-        "checks": json.loads((await _checks(t)).body)["count"],
     }
 
 
@@ -235,14 +226,6 @@ async def overview(
     t: Tracker = Depends(tracker),
 ):
     return await _overview(t, sc)
-
-
-@router.get("/checks")
-async def checks(
-    sc: an.Scope = Depends(scope_of),
-    t: Tracker = Depends(tracker),
-):
-    return await _checks(t, sc)
 
 
 @router.get("/months/{month}")

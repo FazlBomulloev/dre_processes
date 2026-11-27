@@ -7,7 +7,7 @@ from backend import config
 from backend.database import state
 from backend.models import Base, Market
 from backend.services.auth import ensure_first_user
-from backend.services.rgs.store import backfill_moves
+from backend.services.rgs.store import backfill_checks, backfill_moves
 
 log = logging.getLogger(__name__)
 
@@ -59,4 +59,5 @@ async def init_db() -> None:
         await ensure_first_user(db)
         await _seed_markets(db)
         await backfill_moves(db)
+        await backfill_checks(db)
     log.info("База данных готова")

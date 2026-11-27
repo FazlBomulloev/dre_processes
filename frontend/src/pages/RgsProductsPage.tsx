@@ -26,7 +26,6 @@ type Cat = (typeof CATEGORIES)[number]["value"];
 const FLAGS = [
   { key: "red_cycle", label: "Красный цикл" },
   { key: "red_ru", label: "Красный по РУ" },
-  { key: "check", label: "Проверить данные" },
   { key: "stop", label: "Стоп" },
 ];
 
@@ -347,12 +346,6 @@ function CardBody({ p }: { p: RgsProduct }) {
           {p.row != null && ` · строка ${p.row}`}
         </span>
       </div>
-      {p.issues.length > 0 && (
-        <div className="flex flex-col gap-1 rounded-inner bg-warn-tint px-4 py-3 text-[13px] text-warn-ink">
-          <b className="font-semibold">Проверить в трекере</b>
-          {p.issues.map((i, n) => <span key={n}>{i.text}</span>)}
-        </div>
-      )}
       <div className="grid grid-cols-3 gap-2">
         <Box label="Пл ПД" value={formatDate(p.plan_submit)} />
         <Box label="Подано" value={formatDate(p.submitted)} />

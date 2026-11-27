@@ -1,5 +1,5 @@
 export type RgsGroup = "prep" | "submit" | "exp1" | "exp2" | "ru" | "stop";
-export type RgsView = "" | RgsGroup | "red_cycle" | "red_ru" | "check";
+export type RgsView = "" | RgsGroup | "red_cycle" | "red_ru";
 export type RgsCategory = "M" | "FS" | "MD";
 export type Tone = "grn" | "amb" | "red" | "na";
 
@@ -13,6 +13,7 @@ export interface RgsReport {
   optional?: Record<string, string[]>;
   unknown_statuses: Record<string, number>;
   bad_dates: Record<string, number>;
+  checks?: RgsChecks;
   norms_sheet?: boolean;
   norms?: Record<string, number>;
 }
@@ -26,7 +27,6 @@ export interface RgsMeta {
   rows?: number;
   file_name?: string;
   uploaded_at?: string;
-  checks?: number;
 }
 
 export interface RgsSpan {
@@ -92,7 +92,6 @@ export interface RgsRuDue extends RgsRuPlan {
 }
 
 export interface RgsCheck {
-  id: number;
   tm: string;
   sub: string;
   manager: string | null;
@@ -123,7 +122,6 @@ export interface RgsOverview {
   durations: RgsDuration[];
   ru_due: RgsRuDue[];
   funnel: { key: string; name: string; codes: string; count: number }[];
-  checks: RgsChecks;
   months: {
     items: RgsMonth[];
     overdue: number;
@@ -202,7 +200,6 @@ export interface RgsProduct extends RgsRow {
   owner: string | null;
   applicant: string | null;
   status_label: string | null;
-  issues: { kind: string; text: string }[];
   shift: number | null;
   ru_term: number | null;
   steps: RgsStep[];

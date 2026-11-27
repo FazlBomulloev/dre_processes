@@ -79,7 +79,6 @@ export const MARKET_RGS_NAV = [
   { page: "products", label: "Препараты" },
   { page: "kpi", label: "KPI" },
   { page: "meeting", label: "К встрече" },
-  { page: "checks", label: "Проверить данные" },
 ];
 
 export function loginTarget(state: unknown, search: string): string {

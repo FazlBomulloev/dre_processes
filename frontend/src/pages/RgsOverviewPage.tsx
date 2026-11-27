@@ -6,7 +6,7 @@ import {
 import { Page } from "../components/layout/Layout";
 import { PageHeader } from "../components/ui/Card";
 import { ErrorNote, Loading } from "../components/ui/states";
-import { ChecksList, KpiGrid, NormBar } from "../components/rgs/blocks";
+import { KpiGrid, NormBar } from "../components/rgs/blocks";
 import { TonePill } from "../components/rgs/chips";
 import { GroupsPanel } from "../components/rgs/GroupsPanel";
 import { ProductPicker } from "../components/rgs/ProductPicker";
@@ -109,12 +109,6 @@ function Overview({ code, dataDate }: { code: string; dataDate: string | null })
               <Funnel d={d} />
             </div>
           </div>
-          <ChecksList
-            code={code}
-            items={d.checks.items}
-            count={d.checks.count}
-            more
-          />
           <Durations d={d} />
           <Months d={d} onPick={(m) => set({ month: m, stops: null })} />
           <Stopped d={d} onOpen={() => set({ stops: "1", month: null })} />

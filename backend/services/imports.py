@@ -15,7 +15,9 @@ from backend import config
 from backend.models import Import, Market, RgsItem, User, VpcOffer
 from backend.services.rgs.reader import read_rgs
 from backend.services.rgs.settings import mapping
-from backend.services.rgs.store import drop_moves, record_moves
+from backend.services.rgs.store import (
+    attach_checks, drop_moves, record_moves,
+)
 from backend.services.vpc.reader import read_vpc
 
 log = logging.getLogger(__name__)
@@ -195,6 +197,7 @@ async def import_rgs(
         {"import_id": imp.id, **item} for item in result.items
     ])
     moves = await record_moves(db, prev, imp) if prev is not None else 0
+    checks = await attach_checks(db, market, imp)
     await db.execute(
         update(Import)
         .where(*_scope("rgs", market.id), Import.id != imp.id)
@@ -209,8 +212,8 @@ async def import_rgs(
     await db.commit()
     log.info(
         "RGS %s: загружено %d позиций из «%s», снимок %d, переносов "
-        "плана %d, удалено старых снимков %d", market.code, imp.rows,
-        file_name, imp.id, moves, pruned,
+        "плана %d, проверить данные %d, удалено старых снимков %d",
+        market.code, imp.rows, file_name, imp.id, moves, checks, pruned,
     )
     return imp
 

@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
 import clsx from "clsx";
 import { stagger } from "../../lib/anim";
 import {
-  TONE_BAR, TONE_LABEL, kpiGoal, kpiValue, rgsUrl,
+  TONE_BAR, TONE_LABEL, kpiGoal, kpiValue,
 } from "../../lib/rgs";
-import type { RgsCheck, RgsKpi } from "../../types/rgs";
+import type { RgsKpi } from "../../types/rgs";
 import { TonePill } from "./chips";
 
 export function KpiTile({ k, index }: { k: RgsKpi; index: number }) {
@@ -59,43 +58,6 @@ export function NormBar({
         />
       )}
     </span>
-  );
-}
-
-export function ChecksList({
-  code, items, count, more,
-}: {
-  code: string;
-  items: RgsCheck[];
-  count: number;
-  more?: boolean;
-}) {
-  return (
-    <section className="anim-rise flex flex-col gap-2 rounded-card bg-warn-tint px-6 py-5 text-warn-ink">
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <span className="text-base font-semibold">
-          Проверить данные · {count}
-        </span>
-        {more && count > items.length && (
-          <Link
-            to={rgsUrl(code, "checks")}
-            className="text-[13px] font-medium text-warn-ink underline underline-offset-4"
-          >
-            Все {count}
-          </Link>
-        )}
-      </div>
-      {count === 0 && (
-        <span className="text-sm">Ошибок в трекере не найдено.</span>
-      )}
-      {items.map((c, i) => (
-        <span key={`${c.id}:${c.kind}:${i}`} className="text-[13px]">
-          <b className="font-semibold">{c.tm}</b>
-          {c.sub && <span className="opacity-70"> · {c.sub}</span>} —{" "}
-          {c.text}
-        </span>
-      ))}
-    </section>
   );
 }
 

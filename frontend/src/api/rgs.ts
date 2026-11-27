@@ -1,6 +1,6 @@
 import { api } from "./client";
 import type {
-  RgsChanges, RgsChecks, RgsGroups, RgsKpiTable, RgsMeta, RgsOverview,
+  RgsChanges, RgsGroups, RgsKpiTable, RgsMeta, RgsOverview,
   RgsProduct, RgsProducts,
 } from "../types/rgs";
 
@@ -38,10 +38,6 @@ export const getRgsMeta = (code: string, signal?: AbortSignal) =>
 export const getRgsOverview = (
   code: string, params: RgsParams, signal?: AbortSignal,
 ) => get<RgsOverview>(`${base(code)}/overview`, params, signal);
-
-export const getRgsChecks = (
-  code: string, params: RgsParams, signal?: AbortSignal,
-) => get<RgsChecks>(`${base(code)}/checks`, params, signal);
 
 export const getRgsMonth = (
   code: string, month: string, params: RgsParams, signal?: AbortSignal,

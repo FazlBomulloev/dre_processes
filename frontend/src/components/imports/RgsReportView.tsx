@@ -1,7 +1,56 @@
 import { formatInt } from "../../lib/format";
 import { FIELD_LABELS } from "../../lib/rgs";
-import type { RgsReport } from "../../types/rgs";
+import type { RgsChecks, RgsReport } from "../../types/rgs";
 import { KpiGrid, PanelSection } from "../ui/SidePanel";
+
+const KIND_LABEL: Record<string, string> = {
+  status: "Статус",
+  unknown: "Код статуса",
+  order: "Порядок дат",
+  future: "Дата в будущем",
+  no_plan: "Нет «Пл ПД»",
+  no_category: "Нет категории",
+  step: "Срок шага",
+};
+
+function Checks({ checks }: { checks: RgsChecks }) {
+  return (
+    <PanelSection
+      title={`Проверить данные · ${formatInt(checks.count)}`}
+      note="Ошибки в трекере: исправьте в Excel и загрузите заново"
+    >
+      {checks.count === 0 ? (
+        <span className="text-sm text-muted">Ошибок в трекере не найдено.</span>
+      ) : (
+        <div className="flex flex-col text-[13px]">
+          {checks.items.map((c, i) => (
+            <div
+              key={`${c.sheet}:${c.row}:${c.kind}:${i}`}
+              className="flex flex-col gap-0.5 border-b border-line py-2 last:border-b-0"
+            >
+              <span className="flex items-baseline justify-between gap-3">
+                <span className="min-w-0 truncate">
+                  <b className="font-semibold">{c.tm}</b>
+                  {c.sub && <span className="text-faint"> · {c.sub}</span>}
+                </span>
+                <span className="shrink-0 text-xs text-faint tabular-nums">
+                  {c.sheet}
+                  {c.row != null && ` · стр. ${c.row}`}
+                </span>
+              </span>
+              <span>
+                <span className="mr-1.5 rounded-full bg-warn-tint px-2 py-0.5 text-xs text-warn-ink">
+                  {KIND_LABEL[c.kind] ?? c.kind}
+                </span>
+                {c.text}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </PanelSection>
+  );
+}
 
 export function RgsReportView({ report }: { report: RgsReport }) {
   const statuses = Object.entries(report.unknown_statuses);
@@ -11,6 +60,13 @@ export function RgsReportView({ report }: { report: RgsReport }) {
       <KpiGrid
         items={[
           { label: "Позиций", value: formatInt(report.rows) },
+          ...(report.checks
+            ? [{
+                label: "Проверить",
+                value: formatInt(report.checks.count),
+                color: report.checks.count ? "var(--color-warn-ink)" : undefined,
+              }]
+            : []),
           { label: "Новых (IN)", value: formatInt(report.new) },
           {
             label: "Дублей",
@@ -19,6 +75,7 @@ export function RgsReportView({ report }: { report: RgsReport }) {
           },
         ]}
       />
+      {report.checks && <Checks checks={report.checks} />}
       {Object.entries(report.sheets).map(([sheet, rows]) => {
         const missing = report.missing[sheet] ?? [];
         const optional = report.optional?.[sheet] ?? [];

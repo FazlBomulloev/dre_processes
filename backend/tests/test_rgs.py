@@ -217,9 +217,7 @@ def test_design_kpis(tmp_path):
     }
     assert data["kpis"][0]["base"] == "0 из 4 с планом"
     assert [f["count"] for f in data["funnel"]] == [0, 0, 1, 9, 0]
-    assert "managers" not in data
-    assert data["checks"]["count"] == 3
-    assert {c["kind"] for c in data["checks"]["items"]} == {"status"}
+    assert "managers" not in data and "checks" not in data
     assert [r["days"] for r in data["ru_due"]] == [-80, -80, -80, -62,
                                                    -62, -62]
     assert data["months"]["overdue"] == 6
@@ -347,21 +345,23 @@ async def test_api_views(env, tmp_path, today):
     data = (await owner.get("/api/rgs/AZ/products")).json()
     assert data["counts"]["exp1"] == 1 and data["counts"]["exp2"] == 9
     assert data["counts"]["red_cycle"] == 10
-    assert data["counts"]["check"] == 3
+    assert "check" not in data["counts"]
     assert data["counts"]["red_ru"] == 6
     assert [m["name"] for m in data["managers"]] == ["Чоми", "Исфандиер"]
-    checks = (await owner.get(
-        "/api/rgs/AZ/products", params={"view": "check"},
-    )).json()
-    assert {i["tm"] for i in checks["items"]} == {"NEUROCRIN", "LOXICAM"}
     mine = (await owner.get(
         "/api/rgs/AZ/products", params={"mgr": "Исфандиер"},
     )).json()
     assert len(mine["items"]) == 4
     meta = (await owner.get("/api/rgs/AZ/meta")).json()
-    assert meta["checks"] == 3 and meta["today"] == "2026-11-26"
-    rows = (await owner.get("/api/rgs/AZ/checks")).json()
-    assert rows["count"] == 3 and rows["items"][0]["row"] >= 4
+    assert "checks" not in meta and meta["today"] == "2026-11-26"
+    gone = await owner.get("/api/rgs/AZ/checks")
+    assert gone.status_code == 404
+    listed = (await owner.get("/api/imports", params={"kind": "rgs"}))
+    imp_id = listed.json()[0]["id"]
+    report = (await owner.get(f"/api/imports/{imp_id}")).json()["report"]
+    checks = report["checks"]
+    assert checks["count"] == 3 and checks["items"][0]["row"] >= 4
+    assert {c["tm"] for c in checks["items"]} == {"NEUROCRIN", "LOXICAM"}
     picked = (await owner.get(
         "/api/rgs/AZ/overview",
         params=[("tm", "NEUROCRIN"), ("tm", "LOXICAM")],
