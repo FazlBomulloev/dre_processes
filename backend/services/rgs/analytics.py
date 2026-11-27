@@ -116,6 +116,7 @@ class Item:
     submitted: date | None = None
     plan_submit: date | None = None
     ru_date: date | None = None
+    plan_ru: date | None = None
     exp1_invoice: date | None = None
     exp1_paid: date | None = None
     exp2_invoice: date | None = None
@@ -159,11 +160,12 @@ class RuPlan:
     tone: str
     got: bool
     late: int | None
+    source: str | None = None
 
     def out(self) -> dict:
         return {
             "plan": _iso(self.plan), "days": self.days, "tone": self.tone,
-            "got": self.got, "late": self.late,
+            "got": self.got, "late": self.late, "source": self.source,
         }
 
 
@@ -243,12 +245,17 @@ def _later(item: Item, attr: str) -> bool:
 def ru_plan(item: Item, s: Settings) -> RuPlan:
     total = s.norms.ru(item.category)
     got = item.ru_date is not None
-    if total is None or item.task_date is None:
+    if item.plan_ru is not None:
+        plan, source = item.plan_ru, "tracker"
+    elif total is not None and item.task_date is not None:
+        plan = item.task_date + timedelta(days=total)
+        source = "norm"
+    else:
         return RuPlan(None, None, NA, got, None)
-    plan = item.task_date + timedelta(days=total)
     if got:
         late = (item.ru_date - plan).days
-        return RuPlan(plan, None, GRN if late <= 0 else RED, True, late)
+        tone = GRN if late <= 0 else RED
+        return RuPlan(plan, None, tone, True, late, source)
     left = (plan - s.today).days
     if left > s.norms.get("ru_warn"):
         color = GRN
@@ -256,7 +263,7 @@ def ru_plan(item: Item, s: Settings) -> RuPlan:
         color = AMB
     else:
         color = RED
-    return RuPlan(plan, left, color, False, None)
+    return RuPlan(plan, left, color, False, None, source)
 
 
 def span(item: Item, code: str, s: Settings, ru: RuPlan) -> Span:

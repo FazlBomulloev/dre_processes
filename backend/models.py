@@ -182,6 +182,7 @@ class RgsItem(Base):
     submitted = Column(Date, nullable=True)
     plan_submit = Column(Date, nullable=True)
     ru_date = Column(Date, nullable=True)
+    plan_ru = Column(Date, nullable=True)
     exp1_invoice = Column(Date, nullable=True)
     exp1_paid = Column(Date, nullable=True)
     exp2_invoice = Column(Date, nullable=True)

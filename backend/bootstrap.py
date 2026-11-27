@@ -23,6 +23,7 @@ _MIGRATIONS: list[tuple[str, str, str]] = [
     ("rgs_items", "comment_iz", "TEXT"),
     ("rgs_items", "comment_bdm", "TEXT"),
     ("rgs_items", "erp_id", "VARCHAR(60)"),
+    ("rgs_items", "plan_ru", "DATE"),
 ]
 
 

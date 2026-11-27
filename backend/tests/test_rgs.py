@@ -191,6 +191,22 @@ def test_supplement_plan():
     assert (ru.plan, ru.days, ru.tone) == (date(2026, 11, 27), 1, "amb")
 
 
+def test_tracker_plan_ru_wins():
+    item = an.Item(
+        id=1, tm="X", category="M", task_date=date(2025, 3, 14),
+        plan_ru=date(2027, 3, 5),
+    )
+    ru = an.ru_plan(item, settings())
+    assert (ru.plan, ru.days, ru.tone, ru.source) == (
+        date(2027, 3, 5), 99, "grn", "tracker",
+    )
+    item.plan_ru = None
+    ru = an.ru_plan(item, settings())
+    assert (ru.plan, ru.tone, ru.source) == (
+        date(2026, 9, 25), "red", "norm",
+    )
+
+
 def test_design_kpis(tmp_path):
     items = items_of(tracker(tmp_path / "t.xlsx"))
     data = an.overview(items, settings(split=False), an.Scope())

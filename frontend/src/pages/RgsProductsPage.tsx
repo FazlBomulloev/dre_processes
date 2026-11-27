@@ -413,7 +413,9 @@ function CardBody({ p }: { p: RgsProduct }) {
       </table>
       <div className="grid grid-cols-2 gap-2">
         <Box
-          label={p.ru_term ? `План РУ (задача + ${p.ru_term})` : "План РУ"}
+          label={ru.source === "tracker"
+            ? "План РУ (из трекера, «Пл-РУ»)"
+            : p.ru_term ? `План РУ (задача + ${p.ru_term} дн.)` : "План РУ"}
           value={formatDate(ru.plan)}
         />
         <Box

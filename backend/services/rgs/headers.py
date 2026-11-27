@@ -30,6 +30,7 @@ FIELDS: dict[str, tuple[str, ...]] = {
     "plan_submit": ("Пл ПД", "План подачи (май)"),
     "submitted": ("ПД", "Подано в ГНЦЛ"),
     "ru_date": ("РУ",),
+    "plan_ru": ("Пл-РУ", "План получение РУ"),
     "exp1_invoice": (
         "Premilinary Expertise / Invoice receipt date",
         "Preliminary Expertise / Invoice receipt date",
@@ -61,12 +62,12 @@ FIELDS: dict[str, tuple[str, ...]] = {
 REQUIRED = ("tm",)
 DATE_FIELDS = (
     "task_date", "dossier_req", "dossier_analysis", "dossier_ready",
-    "sent_registrar", "plan_submit", "submitted", "ru_date",
+    "sent_registrar", "plan_submit", "submitted", "ru_date", "plan_ru",
     "exp1_invoice", "exp1_paid", "exp2_invoice", "exp2_paid", "step_due",
 )
 OPTIONAL = (
     "dossier_ready", "sent_registrar", "next_step", "step_due",
-    "reason_code",
+    "reason_code", "plan_ru",
 )
 
 

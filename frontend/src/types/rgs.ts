@@ -43,6 +43,7 @@ export interface RgsRuPlan {
   tone: Tone;
   got: boolean;
   late: number | null;
+  source: "tracker" | "norm" | null;
 }
 
 export interface RgsKpi {
