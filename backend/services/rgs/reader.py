@@ -8,26 +8,25 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 from backend.services.rgs import headers as hd
+from backend.services.rgs import norms as nm
+from backend.services.rgs.status import known_status
 from backend.services.vpc.values import clean, to_datetime
 
 HEADER_SCAN_ROWS = 10
 MAIN_SHEETS = ("Е", "E")
 NEW_SHEETS = ("IN",)
 EXTRA_LIMIT = 300
-STATUS_BASE = frozenset({
-    "d", "dc", "dca", "dcb", "dct", "dh", "dha", "dhp", "dhp1", "dhp2",
-    "r",
-})
-STATUS_PREFIXES = ("s", "w", "y")
+MIN_YEAR = 2000
 EXPECTED = (
-    "generic", "form", "dose", "category", "manufacturer", "status_code",
-    "group_code", "task_date", "dossier_req", "dossier_analysis",
-    "plan_submit", "exp1_paid", "exp2_paid", "comment",
+    "generic", "form", "dose", "category", "owner", "manufacturer",
+    "status_code", "task_date", "plan_submit", "submitted", "exp1_paid",
+    "exp2_paid", "ru_date",
 )
 _TRUTHY_EMPTY = frozenset({"0", "-", "—", "нет", "no", "false", "❌"})
 _TEXT = (
     "tm", "tm_ru", "generic", "form", "dose", "pack", "owner",
-    "manufacturer", "applicant", "group_code", "comment",
+    "manufacturer", "applicant", "group_code", "comment", "comment_iz",
+    "comment_bdm", "next_step", "reason_code",
 )
 
 
@@ -39,14 +38,6 @@ class RgsFormatError(ValueError):
 class RgsParse:
     items: list[dict]
     report: dict
-
-
-def known_status(code: str | None) -> bool:
-    if not code:
-        return True
-    if code in STATUS_BASE:
-        return True
-    return code[0] in STATUS_PREFIXES and code[1:] in STATUS_BASE
 
 
 def _filled(value) -> bool:
@@ -105,6 +96,9 @@ def _parse_sheet(
     report["missing"][ws.title] = [
         f for f in EXPECTED if f not in cols
     ]
+    report["optional"][ws.title] = [
+        f for f in hd.OPTIONAL if f not in cols
+    ]
     used = set(cols.values())
     start = h + (2 if sub else 1)
     items = []
@@ -143,12 +137,11 @@ def _item(row: Sequence, cols: dict[str, int], report: dict) -> dict:
     for field in hd.DATE_FIELDS:
         raw = _cell(row, cols.get(field))
         value = to_datetime(raw)
+        if value is not None and value.year < MIN_YEAR:
+            value = None
         if value is None and clean(raw):
             report["bad_dates"][field] += 1
         dates[field] = value.date() if value else None
-    may = dates.pop("submitted_may")
-    fact = dates.pop("submitted_fact")
-    item["submitted"] = may or fact
     item.update(dates)
     mask = 0
     for i in range(len(hd.DOCS)):
@@ -176,12 +169,20 @@ def _merge_new(items: list[dict], new: list[dict]) -> list[dict]:
     return added
 
 
+def _norms(wb) -> dict[str, int] | None:
+    for ws in wb.worksheets:
+        if hd.norm(ws.title) == hd.norm(nm.SHEET):
+            return nm.parse(ws.iter_rows(values_only=True))
+    return None
+
+
 def read_rgs(path: Path, overrides: dict | None = None) -> RgsParse:
     overrides = overrides or {}
     report: dict = {
         "sheets": {},
         "columns": {},
         "missing": {},
+        "optional": {},
         "unknown_statuses": Counter(),
         "bad_dates": Counter(),
     }
@@ -191,8 +192,11 @@ def read_rgs(path: Path, overrides: dict | None = None) -> RgsParse:
         for i, ws in enumerate(_sheets(wb)):
             parsed = _parse_sheet(ws, overrides, report, i == 0)
             items.extend(parsed if i == 0 else _merge_new(items, parsed))
+        norms = _norms(wb)
     finally:
         wb.close()
+    report["norms_sheet"] = norms is not None
+    report["norms"] = norms or {}
     if not items:
         raise RgsFormatError("В файле не найдено ни одной позиции")
     keys = Counter(

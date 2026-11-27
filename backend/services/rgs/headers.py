@@ -19,44 +19,53 @@ FIELDS: dict[str, tuple[str, ...]] = {
     "status_code": ("статус",),
     "group_code": ("Упр Ктг",),
     "is_new": ("IN (новый)",),
-    "task_date": ("Дата получ. задачи", "1. Дата Получ Зч по почте"),
-    "dossier_req": ("ЗД (запрос досье)", "ЗД"),
-    "dossier_analysis": ("АД (анализ досье)", "АД"),
-    "submitted_may": ("Подано в ГНЦЛ",),
-    "submitted_fact": ("ПД",),
-    "plan_submit": ("План подачи (май)", "План подача"),
-    "plan_ru": ("План получение РУ",),
-    "plan_ru_shifted": ("План получения РУ (май)",),
+    "task_date": ("1. Дата Получ Зч по почте", "Дата получ. задачи"),
+    "dossier_req": ("ЗД", "ЗД (запрос досье)"),
+    "dossier_analysis": ("АД", "АД (анализ досье)"),
+    "dossier_ready": ("dcz: досье готово", "dcz", "Досье готово"),
+    "sent_registrar": (
+        "dh: отправлено регистратору", "dh", "Отправлено регистратору",
+    ),
+    "plan_submit": ("Пл ПД", "План подачи (май)"),
+    "submitted": ("ПД", "Подано в ГНЦЛ"),
     "ru_date": ("РУ",),
     "exp1_invoice": (
-        "Первичная экспертиза: инвойс",
         "Premilinary Expertise / Invoice receipt date",
         "Preliminary Expertise / Invoice receipt date",
+        "Первичная экспертиза: инвойс",
     ),
     "exp1_paid": (
-        "Первичная экспертиза: оплата",
         "Premilinary Expertise / Payment",
         "Preliminary Expertise / Payment",
+        "Первичная экспертиза: оплата",
     ),
     "exp2_invoice": (
-        "Специализированная экспертиза: инвойс",
         "Specilized Expertise / Invoice receipt date",
         "Specialized Expertise / Invoice receipt date",
+        "Специализированная экспертиза: инвойс",
     ),
     "exp2_paid": (
-        "Специализированная экспертиза: оплата",
         "Specilized Expertise / Payment",
         "Specialized Expertise / Payment",
+        "Специализированная экспертиза: оплата",
     ),
-    "comment": ("Комментарий", "JS / IZ (Comments)"),
+    "next_step": ("Следующий шаг",),
+    "step_due": ("Срок шага",),
+    "reason_code": ("Код причины",),
+    "comment": ("JS / IZ (Comments)", "Комментарий"),
+    "comment_iz": ("Комментарии ИЗ и ЧС",),
+    "comment_bdm": ("Комментарии БДМ",),
     **{f"doc_{i}": (name,) for i, name in enumerate(DOCS)},
 }
 REQUIRED = ("tm",)
 DATE_FIELDS = (
-    "task_date", "dossier_req", "dossier_analysis", "submitted_may",
-    "submitted_fact", "plan_submit", "plan_ru", "plan_ru_shifted",
-    "ru_date",
-    "exp1_invoice", "exp1_paid", "exp2_invoice", "exp2_paid",
+    "task_date", "dossier_req", "dossier_analysis", "dossier_ready",
+    "sent_registrar", "plan_submit", "submitted", "ru_date",
+    "exp1_invoice", "exp1_paid", "exp2_invoice", "exp2_paid", "step_due",
+)
+OPTIONAL = (
+    "dossier_ready", "sent_registrar", "next_step", "step_due",
+    "reason_code",
 )
 
 

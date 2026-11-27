@@ -4,7 +4,7 @@ import clsx from "clsx";
 import type { RgsGroupRow, RgsGroups } from "../../types/rgs";
 import { SidePanel } from "../ui/SidePanel";
 import { ErrorNote, Loading } from "../ui/states";
-import { StageChip } from "./chips";
+import { GroupChip } from "./chips";
 
 export function GroupsPanel({
   eyebrow, title, data, error, onClose,
@@ -81,7 +81,7 @@ function Row({ row }: { row: RgsGroupRow }) {
                     .filter(Boolean).join(" · ")}
                 </span>
               </span>
-              <StageChip stage={v.stage} />
+              <GroupChip group={v.group} />
             </div>
           ))}
           {row.comment && (

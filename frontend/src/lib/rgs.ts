@@ -1,26 +1,69 @@
-import type { RgsReport, RgsStage } from "../types/rgs";
+import type { RgsKpi, RgsReport, Tone } from "../types/rgs";
 
-export const RGS_STAGES: { key: RgsStage; label: string }[] = [
-  { key: "prep", label: "Готовится" },
-  { key: "wait", label: "Ждёт экспертизы" },
-  { key: "exp1", label: "Первичная оплачена" },
-  { key: "exp2", label: "Специализированная оплачена" },
-  { key: "ru", label: "РУ получено" },
-  { key: "stop", label: "Стоп" },
+export const RGS_GROUPS: { key: string; label: string; codes: string }[] = [
+  { key: "prep", label: "Комплектация", codes: "d…dcz" },
+  { key: "submit", label: "Подача", codes: "dh, dha" },
+  { key: "exp1", label: "1-я экспертиза", codes: "dhp1" },
+  { key: "exp2", label: "2-я экспертиза", codes: "dhp2" },
+  { key: "ru", label: "Зарегистрировано", codes: "r" },
 ];
 
-export const STAGE_LABEL: Record<string, string> = Object.fromEntries(
-  RGS_STAGES.map((s) => [s.key, s.label]),
-);
+export const GROUP_LABEL: Record<string, string> = {
+  ...Object.fromEntries(RGS_GROUPS.map((g) => [g.key, g.label])),
+  stop: "Стоп",
+};
 
-export const STAGE_CHIP: Record<string, string> = {
+export const GROUP_CHIP: Record<string, string> = {
   prep: "bg-subtle text-muted",
-  wait: "bg-accent-tint text-accent",
+  submit: "bg-accent-tint text-accent",
   exp1: "bg-accent-soft/60 text-rgs-ink",
   exp2: "bg-rgs-ink text-white",
   ru: "bg-pos-tint text-pos",
   stop: "bg-seg text-faint",
 };
+
+export const TONE_PILL: Record<Tone, string> = {
+  grn: "bg-pos-tint text-pos",
+  amb: "bg-warn-tint text-warn-ink",
+  red: "bg-bad-tint text-bad-ink",
+  na: "bg-subtle text-muted-2",
+};
+
+export const TONE_BAR: Record<Tone, string> = {
+  grn: "bg-pos",
+  amb: "bg-cat-watch",
+  red: "bg-bad",
+  na: "bg-seg",
+};
+
+export const TONE_DOT_INK: Record<Tone, string> = {
+  grn: "bg-pos-on-ink",
+  amb: "bg-cat-watch",
+  red: "bg-neg-on-ink",
+  na: "bg-white/25",
+};
+
+export const TONE_LABEL: Record<Tone, string> = {
+  grn: "Зелёный",
+  amb: "Жёлтый",
+  red: "Красный",
+  na: "нет данных",
+};
+
+export const STATUS_HINT: Record<string, string> = {
+  d: "задача получена",
+  dcz: "досье готово: комплектация и перевод завершены",
+  dh: "досье отправлено регистратору",
+  dha: "досье подано в Минздрав",
+  dhi: "счёт получен",
+  dhp1: "1-я экспертиза оплачена",
+  dhp2: "2-я экспертиза оплачена",
+  r: "РУ получено",
+};
+
+export function signed(n: number): string {
+  return n > 0 ? `+${n}` : String(n).replace("-", "−");
+}
 
 export const CATEGORIES = [
   { value: "", label: "Все" },
@@ -50,17 +93,21 @@ export const FIELD_LABELS: Record<string, string> = {
   task_date: "Дата задачи",
   dossier_req: "Запрос досье",
   dossier_analysis: "Анализ досье",
-  submitted_may: "Подано (майский файл)",
-  submitted_fact: "Подано (факт)",
-  plan_submit: "План подачи",
-  plan_ru: "План РУ",
-  plan_ru_shifted: "План РУ с запасом",
+  dossier_ready: "Досье готово (dcz)",
+  sent_registrar: "Отправлено регистратору (dh)",
+  submitted: "Подано (ПД)",
+  plan_submit: "План подачи (Пл ПД)",
   ru_date: "Дата РУ",
+  next_step: "Следующий шаг",
+  step_due: "Срок шага",
+  reason_code: "Код причины",
+  comment_iz: "Комментарии ИЗ и ЧС",
+  comment_bdm: "Комментарии БДМ",
   exp1_invoice: "Первичная: инвойс",
   exp1_paid: "Первичная: оплата",
   exp2_invoice: "Специализированная: инвойс",
   exp2_paid: "Специализированная: оплата",
-  comment: "Комментарий",
+  comment: "JS / IZ (Comments)",
 };
 
 const MONTHS = [
@@ -96,4 +143,26 @@ export function rgsProblems(report: RgsReport): number {
 
 export function rgsUrl(code: string, page = ""): string {
   return `/market/${code}/rgs${page ? `/${page}` : ""}`;
+}
+
+export function kpiValue(k: RgsKpi): string {
+  if (k.value == null) return "—";
+  if (k.unit === "%") return `${k.value}%`;
+  if (k.unit) return `${k.value} ${k.unit}`;
+  return String(k.value);
+}
+
+function bound(k: RgsKpi, value: number): string {
+  if (k.unit === "%") return `${value}%`;
+  if (k.unit) return `${value} ${k.unit}`;
+  return String(value);
+}
+
+export function kpiGoal(k: RgsKpi): string {
+  if (k.up) return k.goal >= 100 ? bound(k, k.goal) : `≥ ${bound(k, k.goal)}`;
+  return k.goal === 0 && !k.unit ? "0" : `≤ ${bound(k, k.goal)}`;
+}
+
+export function kpiRed(k: RgsKpi): string {
+  return k.up ? `< ${bound(k, k.red)}` : `> ${bound(k, k.red)}`;
 }

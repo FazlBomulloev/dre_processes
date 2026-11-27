@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown, KeyRound, LogOut } from "lucide-react";
 import clsx from "clsx";
 import { getMarkets, logout } from "../../api/client";
+import { getRgsMeta } from "../../api/rgs";
 import { useFetch } from "../../hooks/useFetch";
 import { useOutsideClose } from "../../hooks/useDismiss";
 import { useSession } from "../../hooks/useSession";
@@ -94,6 +95,9 @@ export default function TopBar() {
                 className={subClass}
               >
                 {item.label}
+                {marketRgs && item.page === "checks" && (
+                  <ChecksCount code={code} />
+                )}
               </NavLink>
             ))}
           </nav>
@@ -126,6 +130,13 @@ export default function TopBar() {
       </div>
     </header>
   );
+}
+
+function ChecksCount({ code }: { code: string }) {
+  const meta = useFetch((signal) => getRgsMeta(code, signal), [code]);
+  const n = meta.data?.checks;
+  if (!n) return null;
+  return <span className="tabular-nums"> · {n}</span>;
 }
 
 function MarketSwitcher({

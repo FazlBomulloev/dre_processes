@@ -10,6 +10,8 @@ import { VpcScopeContext, marketScope } from "../hooks/useVpcScope";
 import { MARKET_NAV } from "../lib/nav";
 import RgsOverviewPage from "./RgsOverviewPage";
 import RgsProductsPage from "./RgsProductsPage";
+import RgsKpiPage from "./RgsKpiPage";
+import RgsChecksPage from "./RgsChecksPage";
 import VpcCountriesPage from "./VpcCountriesPage";
 import VpcCountryPage from "./VpcCountryPage";
 import VpcFactoriesPage from "./VpcFactoriesPage";
@@ -79,6 +81,8 @@ export default function MarketPage() {
         <Route path="rgs">
           <Route index element={<RgsOverviewPage />} />
           <Route path="products" element={<RgsProductsPage />} />
+          <Route path="kpi" element={<RgsKpiPage />} />
+          <Route path="checks" element={<RgsChecksPage />} />
           <Route path="*" element={<Navigate to="." replace />} />
         </Route>
       )}

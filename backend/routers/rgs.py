@@ -12,6 +12,7 @@ from openpyxl.cell import WriteOnlyCell
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend import config
 from backend.database import get_db
 from backend.models import Import, Market, RgsItem
 from backend.services.access import (
@@ -27,15 +28,23 @@ router = APIRouter(prefix="/rgs/{code}", tags=["rgs"])
 
 _module = require("module:rgs")
 _FIELDS = {f.name for f in fields(an.Item)} - {"extra"}
-_MONTH = r"^\d{4}-(0[1-9]|1[0-2])$"
-_STAGE = "^(" + "|".join(k for k, _ in an.STAGES) + ")$"
+_MONTH = r"^(\d{4}-(0[1-9]|1[0-2])|overdue)$"
+_VIEW = "^(" + "|".join(an.VIEWS) + ")$"
 _CAT = "^(" + "|".join(an.CATEGORIES) + ")$"
+_TONES = {
+    an.GRN: "зелёный", an.AMB: "жёлтый", an.RED: "красный",
+    an.NA: "нет данных",
+}
 _EXPORT_COLUMNS = (
     "ТМ", "ТМ (рус.)", "МНН", "Форма", "Дозировка", "Упаковка",
-    "Категория", "Производитель", "Ответственный", "Этап",
-    "Подано в Минздрав", "План подачи", "План РУ", "Комментарий",
+    "Категория", "Производитель", "Менеджер", "Статус", "Статус по датам",
+    "Пл ПД", "Подано", "Сдвиг, дн.", "Цикл до подачи, дн.",
+    "Цикл до подачи", "План РУ", "До плана РУ, дн.", "План РУ: цвет",
+    "Следующий шаг", "Срок шага", "Код причины", "JS / IZ (Comments)",
+    "Комментарии ИЗ и ЧС", "Комментарии БДМ",
 )
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+MAX_TMS = 200
 
 CACHE = LruCache(max_items=300)
 ITEMS = LruCache(max_items=16)
@@ -93,6 +102,10 @@ def own_of(access: Access) -> tuple[str, ...] | None:
     return None if names is None else tuple(sorted(names))
 
 
+def today() -> date:
+    return config.RGS_TODAY or date.today()
+
+
 async def load(
     db: AsyncSession, market: Market, own: tuple[str, ...] | None,
 ) -> Tracker | None:
@@ -103,8 +116,9 @@ async def load(
     if own is not None:
         names = frozenset(own)
         items = [i for i in items if split_names(i.owner) & names]
-    today = imp.data_date or date.today()
-    return Tracker(market, imp, items, settings(market, today), own)
+    return Tracker(
+        market, imp, items, settings(market, imp, today()), own,
+    )
 
 
 async def tracker(
@@ -121,26 +135,47 @@ async def tracker(
     return t
 
 
-def _overview(t: Tracker, cat: str | None = None):
+def scope_of(
+    cat: str | None = Query(None, pattern=_CAT),
+    year: int | None = Query(None, ge=2000, le=2100),
+    tm: list[str] = Query(default=[]),
+) -> an.Scope:
+    if len(tm) > MAX_TMS:
+        raise HTTPException(
+            422, f"Можно выбрать не больше {MAX_TMS} продуктов",
+        )
+    tms = tuple(sorted({t.strip()[:300] for t in tm if t.strip()}))
+    return an.Scope(cat=cat, year=year, tms=tms)
+
+
+def _overview(t: Tracker, sc: an.Scope = an.Scope()):
     return cached(
-        CACHE, t.key("overview", cat),
-        lambda: an.overview(t.items, t.settings, cat),
+        CACHE, t.key("overview", sc),
+        lambda: an.overview(t.items, t.settings, sc),
     )
 
 
-def _stops(t: Tracker, cat: str | None = None):
+def _checks(t: Tracker, sc: an.Scope = an.Scope()):
     return cached(
-        CACHE, t.key("stops", cat), lambda: an.stops(t.items, cat),
+        CACHE, t.key("checks", sc),
+        lambda: an.checks(t.items, t.settings, sc),
+    )
+
+
+def _stops(t: Tracker, sc: an.Scope = an.Scope()):
+    return cached(
+        CACHE, t.key("stops", sc),
+        lambda: an.stops(t.items, t.settings, sc),
     )
 
 
 def _products(
-    t: Tracker, stage: str | None = None, q: str | None = None,
-    cat: str | None = None,
+    t: Tracker, view: str | None = None, q: str | None = None,
+    cat: str | None = None, mgr: str | None = None,
 ):
     return cached(
-        CACHE, t.key("products", stage, q, cat),
-        lambda: an.products(t.items, t.settings, stage, q, cat),
+        CACHE, t.key("products", view, q, cat, mgr),
+        lambda: an.products(t.items, t.settings, view, q, cat, mgr),
     )
 
 
@@ -156,7 +191,7 @@ async def warm(
             t = await load(db, market, own)
             if t is None:
                 break
-            for job in (_overview(t), _products(t), _stops(t)):
+            for job in (_overview(t), _products(t), _stops(t), _checks(t)):
                 await job
                 done += 1
     return done
@@ -164,76 +199,98 @@ async def warm(
 
 @router.get("/meta")
 async def meta(
-    _: Access = Depends(_module),
+    access: Access = Depends(_module),
     market: Market = Depends(market_access),
     db: AsyncSession = Depends(get_db),
 ):
-    imp = await _current(db, market)
-    if imp is None:
+    t = await load(db, market, own_of(access))
+    if t is None:
         return {"loaded": False, "market": market.code, "name": market.name}
+    imp = t.imp
     return {
         "loaded": True,
         "market": market.code,
         "name": market.name,
         "data_date": imp.data_date.isoformat() if imp.data_date else None,
+        "today": t.settings.today.isoformat(),
         "rows": imp.rows,
         "file_name": imp.file_name,
         "uploaded_at": imp.uploaded_at.isoformat(),
+        "checks": json.loads((await _checks(t)).body)["count"],
     }
 
 
 @router.get("/overview")
 async def overview(
-    cat: str | None = Query(None, pattern=_CAT),
+    sc: an.Scope = Depends(scope_of),
     t: Tracker = Depends(tracker),
 ):
-    return await _overview(t, cat)
+    return await _overview(t, sc)
+
+
+@router.get("/checks")
+async def checks(
+    sc: an.Scope = Depends(scope_of),
+    t: Tracker = Depends(tracker),
+):
+    return await _checks(t, sc)
 
 
 @router.get("/months/{month}")
 async def month(
     month: str = Path(..., pattern=_MONTH),
-    cat: str | None = Query(None, pattern=_CAT),
+    sc: an.Scope = Depends(scope_of),
     t: Tracker = Depends(tracker),
 ):
     return await cached(
-        CACHE, t.key("month", month, cat),
-        lambda: an.month(t.items, t.settings, month, cat),
+        CACHE, t.key("month", month, sc),
+        lambda: an.month(t.items, t.settings, month, sc),
     )
 
 
 @router.get("/stops")
 async def stops(
-    cat: str | None = Query(None, pattern=_CAT),
+    sc: an.Scope = Depends(scope_of),
     t: Tracker = Depends(tracker),
 ):
-    return await _stops(t, cat)
+    return await _stops(t, sc)
 
 
 @router.get("/products")
 async def products(
-    stage: str | None = Query(None, pattern=_STAGE),
+    view: str | None = Query(None, pattern=_VIEW),
     q: str | None = Query(None, max_length=100),
     cat: str | None = Query(None, pattern=_CAT),
+    mgr: str | None = Query(None, max_length=100),
     t: Tracker = Depends(tracker),
 ):
-    return await _products(t, stage, q, cat)
+    return await _products(t, view, q, cat, mgr)
 
 
-def _export_book(items: list[an.Item], s: an.Settings) -> bytes:
+def _date_cell(ws, value: date | None) -> WriteOnlyCell:
+    cell = WriteOnlyCell(ws, value)
+    cell.number_format = "DD.MM.YYYY"
+    return cell
+
+
+def _export_book(evs: list[an.Ev], s: an.Settings) -> bytes:
     wb = Workbook(write_only=True)
     ws = wb.create_sheet("Препараты")
     ws.append(list(_EXPORT_COLUMNS))
-    for i in items:
-        dates = []
-        for value in (i.submitted, i.plan_submit, an.plan_ru(i, s)):
-            cell = WriteOnlyCell(ws, value)
-            cell.number_format = "DD.MM.YYYY"
-            dates.append(cell)
+    for e in evs:
+        i = e.item
+        shift = (
+            (i.submitted - i.plan_submit).days
+            if i.submitted and i.plan_submit else None
+        )
         ws.append([
             i.tm, i.tm_ru, i.generic, i.form, i.dose, i.pack, i.category,
-            i.manufacturer, i.owner, an.STAGE_NAMES.get(an.stage(i)),
-            *dates, i.comment,
+            i.manufacturer, e.manager, i.status_code, e.status.by_date,
+            _date_cell(ws, i.plan_submit), _date_cell(ws, i.submitted),
+            shift, e.cycle.fact, _TONES[e.cycle.tone],
+            _date_cell(ws, e.ru.plan), e.ru.days, _TONES[e.ru.tone],
+            i.next_step, _date_cell(ws, i.step_due), i.reason_code,
+            i.comment, i.comment_iz, i.comment_bdm,
         ])
     buf = io.BytesIO()
     wb.save(buf)
@@ -242,26 +299,27 @@ def _export_book(items: list[an.Item], s: an.Settings) -> bytes:
 
 @router.get("/products.xlsx")
 async def export_products(
-    stage: str | None = Query(None, pattern=_STAGE),
+    view: str | None = Query(None, pattern=_VIEW),
     q: str | None = Query(None, max_length=100),
     cat: str | None = Query(None, pattern=_CAT),
+    mgr: str | None = Query(None, max_length=100),
     t: Tracker = Depends(tracker),
     db: AsyncSession = Depends(get_db),
 ):
     if not t.access.can("export:xlsx"):
         raise HTTPException(403, "Нет права на выгрузку в Excel")
-    rows = an.products(t.items, t.settings, stage, q, cat)["items"]
-    by_id = {i.id: i for i in t.items}
-    items = [by_id[r["id"]] for r in rows]
-    content = await asyncio.to_thread(_export_book, items, t.settings)
+    _, _, evs = an.product_evs(t.items, t.settings, view, q, cat, mgr)
+    content = await asyncio.to_thread(_export_book, evs, t.settings)
     used = {
-        k: v for k, v in {"stage": stage, "q": q, "cat": cat}.items() if v
+        k: v for k, v in {
+            "view": view, "q": q, "cat": cat, "mgr": mgr,
+        }.items() if v
     }
     await record(
         db, t.access.user, "rgs_export", t.market.id,
-        rows=len(items), **used,
+        rows=len(evs), **used,
     )
-    log.info("RGS %s: выгрузка в Excel, строк %d", t.market.code, len(items))
+    log.info("RGS %s: выгрузка в Excel, строк %d", t.market.code, len(evs))
     name = f"rgs_{t.market.code}_{date.today().isoformat()}.xlsx"
     return StreamingResponse(
         io.BytesIO(content),

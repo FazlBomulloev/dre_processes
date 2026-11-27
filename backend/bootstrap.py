@@ -14,6 +14,13 @@ log = logging.getLogger(__name__)
 _MIGRATIONS: list[tuple[str, str, str]] = [
     ("users", "own_only", "BOOLEAN NOT NULL DEFAULT 0"),
     ("users", "source_names", "TEXT"),
+    ("rgs_items", "dossier_ready", "DATE"),
+    ("rgs_items", "sent_registrar", "DATE"),
+    ("rgs_items", "step_due", "DATE"),
+    ("rgs_items", "next_step", "TEXT"),
+    ("rgs_items", "reason_code", "VARCHAR(100)"),
+    ("rgs_items", "comment_iz", "TEXT"),
+    ("rgs_items", "comment_bdm", "TEXT"),
 ]
 
 

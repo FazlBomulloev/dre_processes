@@ -33,9 +33,9 @@ VPC_KEEP_SNAPSHOTS = int(os.getenv("VPC_KEEP_SNAPSHOTS", "12"))
 MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "100"))
 PREWARM = _flag("PREWARM", "1")
 RGS_KEEP_SNAPSHOTS = int(os.getenv("RGS_KEEP_SNAPSHOTS", "12"))
-RGS_RU_MARGIN_MONTHS = int(os.getenv("RGS_RU_MARGIN_MONTHS", "2"))
-RGS_PLAN_DATE = date.fromisoformat(
-    os.getenv("RGS_PLAN_DATE", "2026-05-14"),
+RGS_TODAY = (
+    date.fromisoformat(os.getenv("RGS_TODAY"))
+    if os.getenv("RGS_TODAY") else None
 )
 
 

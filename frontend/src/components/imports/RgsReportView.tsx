@@ -21,6 +21,7 @@ export function RgsReportView({ report }: { report: RgsReport }) {
       />
       {Object.entries(report.sheets).map(([sheet, rows]) => {
         const missing = report.missing[sheet] ?? [];
+        const optional = report.optional?.[sheet] ?? [];
         const columns = Object.entries(report.columns[sheet] ?? {});
         return (
           <PanelSection
@@ -31,6 +32,12 @@ export function RgsReportView({ report }: { report: RgsReport }) {
               <div className="rounded-inner bg-warn-tint px-4 py-3 text-sm text-warn-ink">
                 Не найдены колонки:{" "}
                 {missing.map((f) => FIELD_LABELS[f] ?? f).join(", ")}
+              </div>
+            )}
+            {optional.length > 0 && (
+              <div className="rounded-inner bg-subtle px-4 py-3 text-sm text-muted">
+                Новых колонок пока нет в трекере, RGS покажет «нет данных»:{" "}
+                {optional.map((f) => FIELD_LABELS[f] ?? f).join(", ")}
               </div>
             )}
             <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] gap-x-4 text-[13px]">
@@ -48,6 +55,15 @@ export function RgsReportView({ report }: { report: RgsReport }) {
           </PanelSection>
         );
       })}
+      {report.norms_sheet !== undefined && (
+        <PanelSection title="Лист «Нормативы»">
+          <span className="text-sm">
+            {report.norms_sheet
+              ? `Прочитано значений: ${Object.keys(report.norms ?? {}).length}. Остальные — по умолчанию.`
+              : "Листа нет — нормы и цели KPI взяты по умолчанию."}
+          </span>
+        </PanelSection>
+      )}
       {statuses.length > 0 && (
         <PanelSection title="Нераспознанные статусы">
           <span className="text-sm">
