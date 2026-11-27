@@ -1,6 +1,7 @@
 import { api } from "./client";
 import type {
-  RgsChecks, RgsGroups, RgsMeta, RgsOverview, RgsProduct, RgsProducts,
+  RgsChanges, RgsChecks, RgsGroups, RgsKpiTable, RgsMeta, RgsOverview,
+  RgsProduct, RgsProducts,
 } from "../types/rgs";
 
 export type RgsParams = Record<string, string | string[]>;
@@ -57,3 +58,11 @@ export const getRgsProducts = (
 export const getRgsProduct = (
   code: string, id: number, signal?: AbortSignal,
 ) => get<RgsProduct>(`${base(code)}/products/${id}`, {}, signal);
+
+export const getRgsKpi = (
+  code: string, params: RgsParams, signal?: AbortSignal,
+) => get<RgsKpiTable>(`${base(code)}/kpi`, params, signal);
+
+export const getRgsChanges = (
+  code: string, params: RgsParams, signal?: AbortSignal,
+) => get<RgsChanges>(`${base(code)}/changes`, params, signal);

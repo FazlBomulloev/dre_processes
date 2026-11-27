@@ -15,6 +15,7 @@ from backend import config
 from backend.models import Import, Market, RgsItem, User, VpcOffer
 from backend.services.rgs.reader import read_rgs
 from backend.services.rgs.settings import mapping
+from backend.services.rgs.store import drop_moves, record_moves
 from backend.services.vpc.reader import read_vpc
 
 log = logging.getLogger(__name__)
@@ -73,7 +74,9 @@ async def _ensure_markets(
     return created
 
 
-async def _drop_import(db: AsyncSession, imp: Import) -> None:
+async def _drop_import(
+    db: AsyncSession, imp: Import, keep_moves: bool = False,
+) -> None:
     if imp.kind == "vpc":
         await db.execute(
             delete(VpcOffer).where(VpcOffer.import_id == imp.id)
@@ -82,6 +85,8 @@ async def _drop_import(db: AsyncSession, imp: Import) -> None:
         await db.execute(
             delete(RgsItem).where(RgsItem.import_id == imp.id)
         )
+        if not keep_moves:
+            await drop_moves(db, imp.id)
     await db.delete(imp)
     if imp.stored_name:
         (kind_dir(imp.kind) / imp.stored_name).unlink(missing_ok=True)
@@ -97,7 +102,7 @@ async def prune(
         .offset(max(keep - 1, 0))
     )).scalars().all()
     for imp in old:
-        await _drop_import(db, imp)
+        await _drop_import(db, imp, keep_moves=True)
     return len(old)
 
 
@@ -168,6 +173,11 @@ async def import_rgs(
     market: Market, data_date: date,
 ) -> Import:
     result = await asyncio.to_thread(read_rgs, tmp, mapping(market))
+    prev = (await db.execute(
+        select(Import).where(
+            *_scope("rgs", market.id), Import.is_current.is_(True),
+        )
+    )).scalar_one_or_none()
     imp = Import(
         kind="rgs",
         market_id=market.id,
@@ -184,6 +194,7 @@ async def import_rgs(
     await db.execute(insert(RgsItem), [
         {"import_id": imp.id, **item} for item in result.items
     ])
+    moves = await record_moves(db, prev, imp) if prev is not None else 0
     await db.execute(
         update(Import)
         .where(*_scope("rgs", market.id), Import.id != imp.id)
@@ -197,9 +208,9 @@ async def import_rgs(
     pruned = await prune(db, "rgs", config.RGS_KEEP_SNAPSHOTS, market.id)
     await db.commit()
     log.info(
-        "RGS %s: загружено %d позиций из «%s», снимок %d, удалено "
-        "старых снимков %d", market.code, imp.rows, file_name, imp.id,
-        pruned,
+        "RGS %s: загружено %d позиций из «%s», снимок %d, переносов "
+        "плана %d, удалено старых снимков %d", market.code, imp.rows,
+        file_name, imp.id, moves, pruned,
     )
     return imp
 

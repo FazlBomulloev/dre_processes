@@ -8,6 +8,7 @@ from openpyxl import Workbook, load_workbook
 
 from backend import config
 from backend.services.rgs import analytics as an
+from backend.services.rgs.history import item_key
 from backend.services.rgs.reader import read_rgs
 from backend.services.rgs.status import known_status
 
@@ -111,12 +112,14 @@ def items_of(path: Path) -> list[an.Item]:
     ]
 
 
-async def _upload(env, path: Path, market: str = "AZ"):
+async def _upload(
+    env, path: Path, market: str = "AZ", when: str = "2026-11-23",
+):
     owner = await env.owner()
     with open(path, "rb") as f:
         response = await owner.post(
             "/api/imports/rgs",
-            params={"market": market, "data_date": "2026-11-23"},
+            params={"market": market, "data_date": when},
             files={"file": (path.name, f.read(), XLSX)},
         )
     assert response.status_code == 200, response.text
@@ -406,3 +409,59 @@ async def test_own_rows_only(env):
     assert data["counts"][""] + data["counts"]["stop"] == count
     export = await viewer.get("/api/rgs/AZ/products.xlsx")
     assert export.status_code == 403
+
+
+def test_item_key():
+    plain = an.Item(id=1, tm="Neurocrin", form="INJ", dose="5 MG")
+    assert item_key(plain) == "tm:neurocrin|inj|5 mg|"
+    assert item_key(an.Item(id=2, tm="X", erp_id=" 9927 ")) == "erp:9927"
+
+
+async def test_plan_move_and_history(env, tmp_path, today):
+    await _upload(env, tracker(tmp_path / "a.xlsx"), when="2026-11-09")
+    moved = tracker(tmp_path / "b.xlsx", extra={
+        "LOXICAM": {13: date(2026, 6, 25)},
+        "PANOLECT": {6: "dhp2", 20: date(2026, 11, 20)},
+        "NEUROCRIN": {14: date(2026, 7, 13)},
+    })
+    owner = await _upload(env, moved, when="2026-11-23")
+    products = (await owner.get(
+        "/api/rgs/AZ/products", params={"q": "LOXICAM"},
+    )).json()
+    card = (await owner.get(
+        f"/api/rgs/AZ/products/{products['items'][0]['id']}",
+    )).json()
+    assert card["plan_moves"] == [{
+        "at": "2026-11-23", "old": "2026-06-20", "new": "2026-06-25",
+    }]
+    assert card["delay"]["fact"] == 5
+    kpi = (await owner.get("/api/rgs/AZ/kpi")).json()
+    assert [p["date"] for p in kpi["dynamics"]] == [
+        "2026-11-09", "2026-11-23",
+    ]
+    assert kpi["total"]["count"] == 10
+    assert [m["name"] for m in kpi["managers"]] == ["Чоми", "Исфандиер"]
+    assert kpi["kpis"][2]["value"] == 31
+    changes = (await owner.get("/api/rgs/AZ/changes")).json()
+    assert changes["base"]["date"] == "2026-11-09"
+    assert [(m["tm"], m["to"]) for m in changes["moved"]] == [
+        ("PANOLECT", "2-я экспертиза оплачена"),
+    ]
+    assert [m["days"] for m in changes["plan_moves"]] == [5]
+    assert changes["new_red"] == [] and changes["added"] == []
+    snaps = (await owner.get("/api/rgs/AZ/snapshots")).json()["items"]
+    assert len(snaps) == 2 and snaps[0]["current"]
+    removed = await owner.delete(f"/api/imports/{snaps[0]['id']}")
+    assert removed.status_code in (200, 204)
+    card = (await owner.get(
+        f"/api/rgs/AZ/products/{products['items'][0]['id'] - 10}",
+    )).json()
+    assert card["plan_moves"] == []
+
+
+async def test_changes_without_base(env, tmp_path, today):
+    owner = await _upload(env, tracker(tmp_path / "a.xlsx"))
+    data = (await owner.get("/api/rgs/AZ/changes")).json()
+    assert data["base"] is None and data["snapshots"] == []
+    kpi = (await owner.get("/api/rgs/AZ/kpi")).json()
+    assert len(kpi["dynamics"]) == 1

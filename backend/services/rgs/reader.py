@@ -26,7 +26,7 @@ _TRUTHY_EMPTY = frozenset({"0", "-", "—", "нет", "no", "false", "❌"})
 _TEXT = (
     "tm", "tm_ru", "generic", "form", "dose", "pack", "owner",
     "manufacturer", "applicant", "group_code", "comment", "comment_iz",
-    "comment_bdm", "next_step", "reason_code",
+    "comment_bdm", "next_step", "reason_code", "erp_id",
 )
 
 

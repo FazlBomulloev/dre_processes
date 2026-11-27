@@ -160,6 +160,7 @@ class RgsItem(Base):
     )
     sheet = Column(String(40), nullable=True)
     row_no = Column(Integer, nullable=True)
+    erp_id = Column(String(60), nullable=True)
     tm = Column(String(300), nullable=False)
     tm_ru = Column(String(300), nullable=True)
     generic = Column(String(500), nullable=True)
@@ -193,6 +194,23 @@ class RgsItem(Base):
     comment_iz = Column(Text, nullable=True)
     comment_bdm = Column(Text, nullable=True)
     extra_json = Column(Text, nullable=True)
+
+
+class RgsPlanMove(Base):
+    __tablename__ = "rgs_plan_moves"
+
+    id = Column(Integer, primary_key=True)
+    market_id = Column(
+        Integer, ForeignKey("markets.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
+    import_id = Column(Integer, nullable=False, index=True)
+    at = Column(Date, nullable=False)
+    key = Column(String(400), nullable=False, index=True)
+    tm = Column(String(300), nullable=False)
+    owner = Column(String(100), nullable=True)
+    old = Column(Date, nullable=False)
+    new = Column(Date, nullable=False)
 
 
 class AuditLog(Base):

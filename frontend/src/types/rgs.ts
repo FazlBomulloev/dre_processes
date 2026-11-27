@@ -224,4 +224,43 @@ export interface RgsProduct extends RgsRow {
   docs: { name: string; ok: boolean }[];
   sheet: string | null;
   row: number | null;
+  plan_moves: { at: string; old: string; new: string }[];
+}
+
+export interface RgsSnapshot {
+  id: number;
+  date: string;
+  file_name: string;
+  current: boolean;
+}
+
+export interface RgsKpiRow {
+  name: string;
+  count: number;
+  kpis: RgsKpi[];
+}
+
+export interface RgsKpiTable {
+  kpis: RgsKpi[];
+  managers: RgsKpiRow[];
+  total: RgsKpiRow;
+  dynamics: (RgsSnapshot & { values: Record<string, number | null> })[];
+}
+
+export interface RgsBriefRow {
+  id: number;
+  tm: string;
+  sub: string;
+  manager: string | null;
+}
+
+export interface RgsChanges {
+  current: RgsSnapshot;
+  base: RgsSnapshot | null;
+  snapshots: RgsSnapshot[];
+  new_red?: (RgsBriefRow & { metric: string; label: string; value: number | null })[];
+  moved?: (RgsBriefRow & { from: string; to: string })[];
+  plan_moves?: (RgsBriefRow & { old: string; new: string; days: number })[];
+  ru_soon?: (RgsBriefRow & { plan: string; days: number })[];
+  added?: RgsBriefRow[];
 }

@@ -7,6 +7,7 @@ DOCS = ("Dossier", "Artwork", "Leaflet", "CPP/FSC", "Sample", "WS", "COA")
 
 FIELDS: dict[str, tuple[str, ...]] = {
     "tm": ("TM ENG",),
+    "erp_id": ("ERP-ID", "ERP ID"),
     "tm_ru": ("TM RUS", "TM RUSS"),
     "generic": ("GENERIC",),
     "form": ("FORM",),

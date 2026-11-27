@@ -2,8 +2,8 @@ import asyncio
 import io
 import json
 import logging
-from dataclasses import dataclass, fields
-from datetime import date
+from dataclasses import dataclass
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.responses import StreamingResponse
@@ -14,20 +14,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend import config
 from backend.database import get_db
-from backend.models import Import, Market, RgsItem
+from backend.models import Import, Market
 from backend.services.access import (
     Access, market_access, require, split_names,
 )
 from backend.services.audit import record
 from backend.services.cache import LruCache, cached
 from backend.services.rgs import analytics as an
+from backend.services.rgs import store
+from backend.services.rgs.history import changes, item_key, snapshot_date
 from backend.services.rgs.settings import settings
 
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/rgs/{code}", tags=["rgs"])
 
 _module = require("module:rgs")
-_FIELDS = {f.name for f in fields(an.Item)} - {"extra"}
 _MONTH = r"^(\d{4}-(0[1-9]|1[0-2])|overdue)$"
 _VIEW = "^(" + "|".join(an.VIEWS) + ")$"
 _CAT = "^(" + "|".join(an.CATEGORIES) + ")$"
@@ -45,6 +46,8 @@ _EXPORT_COLUMNS = (
 )
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 MAX_TMS = 200
+DYNAMICS = 6
+MEETING_DAYS = 14
 
 CACHE = LruCache(max_items=300)
 ITEMS = LruCache(max_items=16)
@@ -67,13 +70,6 @@ class Tracker:
         )
 
 
-def _item(row: RgsItem) -> an.Item:
-    item = an.Item(**{f: getattr(row, f) for f in _FIELDS})
-    if row.extra_json:
-        item.extra = json.loads(row.extra_json)
-    return item
-
-
 async def _current(db: AsyncSession, market: Market) -> Import | None:
     return (await db.execute(
         select(Import).where(
@@ -88,13 +84,29 @@ async def _items(db: AsyncSession, imp: Import) -> list[an.Item]:
     key = (imp.id, imp.uploaded_at)
     items = ITEMS.get(key)
     if items is None:
-        rows = (await db.execute(
-            select(RgsItem).where(RgsItem.import_id == imp.id)
-            .order_by(RgsItem.id)
-        )).scalars().all()
-        items = [_item(r) for r in rows]
+        items = await store.load_items(db, imp.id)
         ITEMS.set(key, items)
     return items
+
+
+def _own(
+    items: list[an.Item], own: tuple[str, ...] | None,
+) -> list[an.Item]:
+    if own is None:
+        return items
+    names = frozenset(own)
+    return [i for i in items if split_names(i.owner) & names]
+
+
+def _when(imp: Import) -> date:
+    return snapshot_date(imp.data_date, imp.uploaded_at.date())
+
+
+async def _snapshot(
+    db: AsyncSession, t: "Tracker", imp: Import,
+) -> tuple[list[an.Item], an.Settings]:
+    items = _own(await _items(db, imp), t.own)
+    return items, settings(t.market, imp, _when(imp))
 
 
 def own_of(access: Access) -> tuple[str, ...] | None:
@@ -112,10 +124,7 @@ async def load(
     imp = await _current(db, market)
     if imp is None:
         return None
-    items = await _items(db, imp)
-    if own is not None:
-        names = frozenset(own)
-        items = [i for i in items if split_names(i.owner) & names]
+    items = _own(await _items(db, imp), own)
     return Tracker(
         market, imp, items, settings(market, imp, today()), own,
     )
@@ -329,8 +338,119 @@ async def export_products(
 
 
 @router.get("/products/{item_id}")
-async def product(item_id: int, t: Tracker = Depends(tracker)):
+async def product(
+    item_id: int,
+    t: Tracker = Depends(tracker),
+    db: AsyncSession = Depends(get_db),
+):
     item = next((i for i in t.items if i.id == item_id), None)
     if item is None:
         raise HTTPException(404, "Препарат не найден")
-    return an.product(item, t.settings)
+    moves = await store.moves_for(db, t.market.id, item_key(item))
+    return {
+        **an.product(item, t.settings),
+        "plan_moves": [
+            {
+                "at": m.at.isoformat(), "old": m.old.isoformat(),
+                "new": m.new.isoformat(),
+            }
+            for m in moves
+        ],
+    }
+
+
+def _snapshot_out(imp: Import) -> dict:
+    return {
+        "id": imp.id,
+        "date": _when(imp).isoformat(),
+        "file_name": imp.file_name,
+        "current": bool(imp.is_current),
+    }
+
+
+@router.get("/snapshots")
+async def snapshots(
+    t: Tracker = Depends(tracker),
+    db: AsyncSession = Depends(get_db),
+):
+    return {
+        "items": [
+            _snapshot_out(imp)
+            for imp in await store.snapshots(db, t.market.id)
+        ],
+    }
+
+
+@router.get("/kpi")
+async def kpi(
+    cat: str | None = Query(None, pattern=_CAT),
+    t: Tracker = Depends(tracker),
+    db: AsyncSession = Depends(get_db),
+):
+    history = await store.snapshots(db, t.market.id, DYNAMICS)
+    history.sort(key=lambda imp: (_when(imp), imp.id))
+    loaded = [(imp, *await _snapshot(db, t, imp)) for imp in history]
+    sc = an.Scope(cat=cat)
+    ids = tuple(imp.id for imp in history)
+
+    def build() -> dict:
+        evs = an.active_evs(t.items, t.settings, sc)
+        table = an.kpi_table(evs, t.settings)
+        points = []
+        for imp, items, s in loaded:
+            values = an.kpis(an.active_evs(items, s, sc), s)
+            points.append({
+                **_snapshot_out(imp),
+                "values": {k["key"]: k["value"] for k in values},
+            })
+        return {**table, "dynamics": points}
+
+    return await cached(CACHE, t.key("kpi", cat, ids), build)
+
+
+def _base_of(history: list[Import], current: Import) -> Import | None:
+    others = sorted(
+        (imp for imp in history if imp.id != current.id),
+        key=lambda imp: (_when(imp), imp.id),
+    )
+    if not others:
+        return None
+    limit = _when(current) - timedelta(days=MEETING_DAYS)
+    older = [imp for imp in others if _when(imp) <= limit]
+    return older[-1] if older else others[0]
+
+
+@router.get("/changes")
+async def meeting_changes(
+    base: int | None = Query(None, ge=1),
+    cat: str | None = Query(None, pattern=_CAT),
+    t: Tracker = Depends(tracker),
+    db: AsyncSession = Depends(get_db),
+):
+    history = await store.snapshots(db, t.market.id)
+    picked = (
+        next((imp for imp in history if imp.id == base), None)
+        if base else _base_of(history, t.imp)
+    )
+    if base and picked is None:
+        raise HTTPException(404, "Снимок не найден")
+    sc = an.Scope(cat=cat)
+    out = {
+        "current": _snapshot_out(t.imp),
+        "base": _snapshot_out(picked) if picked else None,
+        "snapshots": [
+            _snapshot_out(imp) for imp in history if imp.id != t.imp.id
+        ],
+    }
+    if picked is None:
+        return out
+    items, s = await _snapshot(db, t, picked)
+
+    def build() -> dict:
+        return {**out, **changes(
+            an.active_evs(t.items, t.settings, sc),
+            an.active_evs(items, s, sc),
+            t.settings.norms.get("ru_warn"),
+        )}
+
+    return await cached(CACHE, t.key("changes", picked.id, cat), build)

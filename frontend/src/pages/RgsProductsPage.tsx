@@ -362,6 +362,20 @@ function CardBody({ p }: { p: RgsProduct }) {
           dot={p.shift == null ? undefined : p.delay.tone}
         />
       </div>
+      {p.plan_moves.length > 0 && (
+        <div className="flex flex-col gap-1 rounded-inner bg-ink-glass px-4 py-3 text-[13px]">
+          <b className="font-semibold">
+            План подачи переносился {p.plan_moves.length}{" "}
+            {p.plan_moves.length === 1 ? "раз" : p.plan_moves.length < 5 ? "раза" : "раз"}
+          </b>
+          {p.plan_moves.map((m, n) => (
+            <span key={n} className="tabular-nums text-white/70">
+              {formatDate(m.old)} → {formatDate(m.new)}
+              <span className="text-white/45"> · загрузка {formatDate(m.at)}</span>
+            </span>
+          ))}
+        </div>
+      )}
       <table className="w-full border-collapse text-[13px]">
         <thead>
           <tr className="text-left text-[11px] text-white/50">

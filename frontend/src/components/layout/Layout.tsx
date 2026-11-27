@@ -10,14 +10,16 @@ export default function Layout() {
   const mobile = useIsMobile();
   return (
     <div className="flex min-h-(--screen-h) flex-col">
-      <TopBar />
-      {!mobile && <Rail />}
-      <div className="flex flex-1 items-start pl-[calc(clamp(16px,2vw,28px)+72px)] max-md:pl-0">
+      <div className="contents print:hidden">
+        <TopBar />
+        {!mobile && <Rail />}
+      </div>
+      <div className="flex flex-1 items-start pl-[calc(clamp(16px,2vw,28px)+72px)] max-md:pl-0 print:pl-0">
         <div className="min-w-0 flex-1">
           <Outlet />
         </div>
       </div>
-      {mobile && <BottomNav />}
+      {mobile && <div className="print:hidden"><BottomNav /></div>}
     </div>
   );
 }

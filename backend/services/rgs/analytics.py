@@ -107,6 +107,7 @@ class Item:
     is_new: bool = False
     sheet: str | None = None
     row_no: int | None = None
+    erp_id: str | None = None
     task_date: date | None = None
     dossier_req: date | None = None
     dossier_analysis: date | None = None
@@ -468,6 +469,27 @@ def kpis(evs: list[Ev], s: Settings) -> list[dict]:
             "how": how.format(warn=s.norms.get("ru_warn")),
         })
     return out
+
+
+def kpi_table(evs: list[Ev], s: Settings) -> dict:
+    by_name: dict[str, list[Ev]] = defaultdict(list)
+    for e in evs:
+        by_name[e.manager or NO_MANAGER].append(e)
+    rows = [
+        {"name": name, "count": len(group), "kpis": kpis(group, s)}
+        for name, group in sorted(
+            by_name.items(), key=lambda x: (-len(x[1]), x[0]),
+        )
+    ]
+    return {
+        "kpis": kpis(evs, s),
+        "managers": rows,
+        "total": {"name": "Итого", "count": len(evs), "kpis": kpis(evs, s)},
+    }
+
+
+def active_evs(items: list[Item], s: Settings, sc: Scope) -> list[Ev]:
+    return [e for e in _evs(scope(items, sc), s) if not e.stop]
 
 
 def _stage_block(evs: list[Ev], s: Settings, cat: str | None) -> list:

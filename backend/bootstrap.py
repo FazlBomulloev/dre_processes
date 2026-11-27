@@ -7,6 +7,7 @@ from backend import config
 from backend.database import state
 from backend.models import Base, Market
 from backend.services.auth import ensure_first_user
+from backend.services.rgs.store import backfill_moves
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ _MIGRATIONS: list[tuple[str, str, str]] = [
     ("rgs_items", "reason_code", "VARCHAR(100)"),
     ("rgs_items", "comment_iz", "TEXT"),
     ("rgs_items", "comment_bdm", "TEXT"),
+    ("rgs_items", "erp_id", "VARCHAR(60)"),
 ]
 
 
@@ -55,4 +57,5 @@ async def init_db() -> None:
     async with state.session() as db:
         await ensure_first_user(db)
         await _seed_markets(db)
+        await backfill_moves(db)
     log.info("База данных готова")
