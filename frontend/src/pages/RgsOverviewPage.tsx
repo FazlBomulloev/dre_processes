@@ -107,7 +107,6 @@ function Overview({ code, dataDate }: { code: string; dataDate: string | null })
             <RuDue d={d} code={code} />
             <div className="flex min-w-0 flex-col gap-5">
               <Funnel d={d} />
-              <Managers d={d} />
             </div>
           </div>
           <ChecksList
@@ -263,44 +262,6 @@ function Funnel({ d }: { d: RgsOverview }) {
           </div>
         ))}
       </div>
-    </SectionCard>
-  );
-}
-
-function Managers({ d }: { d: RgsOverview }) {
-  return (
-    <SectionCard title="По менеджерам">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="text-left text-xs text-faint">
-            <th className="py-1.5 font-normal">Менеджер</th>
-            <th className="py-1.5 text-right font-normal">Проектов</th>
-            <th className="py-1.5 text-right font-normal">Цикл до ПД</th>
-            <th className="py-1.5 text-right font-normal">Красных по РУ</th>
-          </tr>
-        </thead>
-        <tbody>
-          {d.managers.map((m) => (
-            <tr key={m.name} className="border-t border-line">
-              <td className="py-2.5 font-semibold">{m.name}</td>
-              <td className="py-2.5 text-right tabular-nums">{m.count}</td>
-              <td className="py-2.5 text-right">
-                <TonePill tone={m.cycle_tone}>
-                  {m.cycle == null ? "—" : `${m.cycle} дн.`}
-                </TonePill>
-              </td>
-              <td
-                className={clsx(
-                  "py-2.5 text-right font-semibold tabular-nums",
-                  m.red_ru ? "text-bad" : "text-faintest",
-                )}
-              >
-                {m.red_ru}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </SectionCard>
   );
 }

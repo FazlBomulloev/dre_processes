@@ -1,5 +1,4 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import clsx from "clsx";
 import { getRgsKpi, type RgsParams } from "../api/rgs";
 import { Page } from "../components/layout/Layout";
 import { PageHeader } from "../components/ui/Card";
@@ -13,9 +12,9 @@ import { useFetch } from "../hooks/useFetch";
 import { stagger } from "../lib/anim";
 import { formatDate } from "../lib/format";
 import {
-  CATEGORIES, TONE_LABEL, TONE_PILL, kpiGoal, kpiRed, kpiValue,
+  CATEGORIES, TONE_LABEL, kpiGoal, kpiRed, kpiValue,
 } from "../lib/rgs";
-import type { RgsKpi, RgsKpiRow, RgsKpiTable } from "../types/rgs";
+import type { RgsKpi, RgsKpiTable } from "../types/rgs";
 
 type Cat = (typeof CATEGORIES)[number]["value"];
 
@@ -58,7 +57,6 @@ function Kpi({ code, dataDate }: { code: string; dataDate: string | null }) {
           <div className="grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-md:grid-cols-1">
             {d.kpis.map((k, i) => <KpiCard key={k.key} k={k} index={i} />)}
           </div>
-          <Managers d={d} />
           <Dynamics d={d} />
           <SectionCard title="Как читать цвета">
             <Legend
@@ -137,62 +135,6 @@ function KpiCard({ k, index }: { k: RgsKpi; index: number }) {
       </span>
       <span className="text-xs text-faint">{k.how}</span>
     </div>
-  );
-}
-
-function Cell({ k }: { k: RgsKpi }) {
-  return (
-    <td className="px-2 py-2.5 text-right">
-      <span
-        title={k.base}
-        className={clsx(
-          "inline-flex min-w-[64px] justify-center rounded-full px-2 py-0.5 text-[13px] font-semibold tabular-nums",
-          TONE_PILL[k.tone],
-        )}
-      >
-        {k.value == null ? (k.tone === "na" ? "—" : "") : kpiValue(k)}
-      </span>
-    </td>
-  );
-}
-
-function Row({ row, total }: { row: RgsKpiRow; total?: boolean }) {
-  return (
-    <tr className={clsx("border-t border-line", total && "bg-subtle font-semibold")}>
-      <td className="whitespace-nowrap px-2 py-2.5">
-        {row.name}
-        <span className="ml-1.5 text-xs font-normal text-faint">{row.count}</span>
-      </td>
-      {row.kpis.map((k) => <Cell key={k.key} k={k} />)}
-    </tr>
-  );
-}
-
-function Managers({ d }: { d: RgsKpiTable }) {
-  return (
-    <SectionCard
-      title="KPI по менеджерам"
-      note="Сравнивать с учётом заводов: у менеджеров разный набор производителей"
-    >
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] border-collapse text-sm">
-          <thead>
-            <tr className="text-xs text-faint">
-              <th className="px-2 py-2 text-left font-normal">Менеджер</th>
-              {d.kpis.map((k) => (
-                <th key={k.key} className="px-2 py-2 text-right font-normal">
-                  {k.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {d.managers.map((m) => <Row key={m.name} row={m} />)}
-            <Row row={d.total} total />
-          </tbody>
-        </table>
-      </div>
-    </SectionCard>
   );
 }
 

@@ -107,14 +107,6 @@ export interface RgsChecks {
   items: RgsCheck[];
 }
 
-export interface RgsManagerRow {
-  name: string;
-  count: number;
-  cycle: number | null;
-  cycle_tone: Tone;
-  red_ru: number;
-}
-
 export interface RgsOverview {
   today: string;
   split: boolean;
@@ -131,7 +123,6 @@ export interface RgsOverview {
   durations: RgsDuration[];
   ru_due: RgsRuDue[];
   funnel: { key: string; name: string; codes: string; count: number }[];
-  managers: RgsManagerRow[];
   checks: RgsChecks;
   months: {
     items: RgsMonth[];
@@ -235,16 +226,8 @@ export interface RgsSnapshot {
   current: boolean;
 }
 
-export interface RgsKpiRow {
-  name: string;
-  count: number;
-  kpis: RgsKpi[];
-}
-
 export interface RgsKpiTable {
   kpis: RgsKpi[];
-  managers: RgsKpiRow[];
-  total: RgsKpiRow;
   dynamics: (RgsSnapshot & { values: Record<string, number | null> })[];
 }
 

@@ -478,23 +478,6 @@ def kpis(evs: list[Ev], s: Settings) -> list[dict]:
     return out
 
 
-def kpi_table(evs: list[Ev], s: Settings) -> dict:
-    by_name: dict[str, list[Ev]] = defaultdict(list)
-    for e in evs:
-        by_name[e.manager or NO_MANAGER].append(e)
-    rows = [
-        {"name": name, "count": len(group), "kpis": kpis(group, s)}
-        for name, group in sorted(
-            by_name.items(), key=lambda x: (-len(x[1]), x[0]),
-        )
-    ]
-    return {
-        "kpis": kpis(evs, s),
-        "managers": rows,
-        "total": {"name": "Итого", "count": len(evs), "kpis": kpis(evs, s)},
-    }
-
-
 def active_evs(items: list[Item], s: Settings, sc: Scope) -> list[Ev]:
     return [e for e in _evs(scope(items, sc), s) if not e.stop]
 
@@ -545,27 +528,6 @@ def _funnel(evs: list[Ev]) -> list[dict]:
         }
         for key, name, codes in st.GROUPS
     ]
-
-
-def _managers(evs: list[Ev], s: Settings) -> list[dict]:
-    by_name: dict[str, list[Ev]] = defaultdict(list)
-    for e in evs:
-        by_name[e.manager or NO_MANAGER].append(e)
-    goal, red = s.norms.kpi(2)
-    out = []
-    for name, group in by_name.items():
-        cycle = _kpi_values(group)[2][0]
-        out.append({
-            "name": name,
-            "count": len(group),
-            "cycle": cycle,
-            "cycle_tone": _kpi_tone(cycle, goal, red, False),
-            "red_ru": sum(
-                not e.ru.got and e.ru.tone == RED for e in group
-            ),
-        })
-    out.sort(key=lambda m: (-m["count"], m["name"]))
-    return out
 
 
 def _month(value: date) -> str:
@@ -716,7 +678,6 @@ def overview(items: list[Item], s: Settings, sc: Scope) -> dict:
         "durations": _durations([e.item for e in active]),
         "ru_due": _ru_due(active),
         "funnel": _funnel(active),
-        "managers": _managers(active, s),
         "checks": {"count": len(checks), "items": checks[:CHECKS_PREVIEW]},
         "months": _months(active, s),
         "stopped": sum(e.stop for e in evs),

@@ -217,10 +217,7 @@ def test_design_kpis(tmp_path):
     }
     assert data["kpis"][0]["base"] == "0 из 4 с планом"
     assert [f["count"] for f in data["funnel"]] == [0, 0, 1, 9, 0]
-    assert [(m["name"], m["count"], m["cycle"], m["red_ru"])
-            for m in data["managers"]] == [
-        ("Чоми", 6, 333, 6), ("Исфандиер", 4, 216, 0),
-    ]
+    assert "managers" not in data
     assert data["checks"]["count"] == 3
     assert {c["kind"] for c in data["checks"]["items"]} == {"status"}
     assert [r["days"] for r in data["ru_due"]] == [-80, -80, -80, -62,
@@ -455,8 +452,7 @@ async def test_plan_move_and_history(env, tmp_path, today):
     assert [p["date"] for p in kpi["dynamics"]] == [
         "2026-11-09", "2026-11-23",
     ]
-    assert kpi["total"]["count"] == 10
-    assert [m["name"] for m in kpi["managers"]] == ["Чоми", "Исфандиер"]
+    assert set(kpi) == {"kpis", "dynamics"}
     assert kpi["kpis"][2]["value"] == 31
     changes = (await owner.get("/api/rgs/AZ/changes")).json()
     assert changes["base"]["date"] == "2026-11-09"

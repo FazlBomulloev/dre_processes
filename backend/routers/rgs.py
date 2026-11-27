@@ -395,7 +395,6 @@ async def kpi(
 
     def build() -> dict:
         evs = an.active_evs(t.items, t.settings, sc)
-        table = an.kpi_table(evs, t.settings)
         points = []
         for imp, items, s in loaded:
             values = an.kpis(an.active_evs(items, s, sc), s)
@@ -403,7 +402,7 @@ async def kpi(
                 **_snapshot_out(imp),
                 "values": {k["key"]: k["value"] for k in values},
             })
-        return {**table, "dynamics": points}
+        return {"kpis": an.kpis(evs, t.settings), "dynamics": points}
 
     return await cached(CACHE, t.key("kpi", cat, ids), build)
 
