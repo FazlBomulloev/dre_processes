@@ -41,7 +41,7 @@ function Kpi({ code, dataDate }: { code: string; dataDate: string | null }) {
     <Page maxWidth={1240} dim={data.loading && !!data.data}>
       <PageHeader
         title="KPI регистрации"
-        subtitle={`Данные трекера на ${formatDate(dataDate)} · к встрече раз в 2 недели · цели и нормы — с листа «Нормативы» в Excel`}
+        subtitle={`Данные трекера на ${formatDate(dataDate)} · цели и нормы — с листа «Нормативы» в Excel`}
       >
         <Seg
           label="Категория"
@@ -63,7 +63,7 @@ function Kpi({ code, dataDate }: { code: string; dataDate: string | null }) {
               items={[
                 ["grn", "Зелёный — цель выполнена"],
                 ["amb", "Жёлтый — хуже цели, но не в красной зоне"],
-                ["red", "Красный — в красной зоне, разбор на встрече"],
+                ["red", "Красный — в красной зоне"],
                 ["na", "Нет данных — в трекере не хватает дат"],
               ]}
             />

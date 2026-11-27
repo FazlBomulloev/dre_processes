@@ -227,21 +227,3 @@ export interface RgsKpiTable {
   kpis: RgsKpi[];
   dynamics: (RgsSnapshot & { values: Record<string, number | null> })[];
 }
-
-export interface RgsBriefRow {
-  id: number;
-  tm: string;
-  sub: string;
-  manager: string | null;
-}
-
-export interface RgsChanges {
-  current: RgsSnapshot;
-  base: RgsSnapshot | null;
-  snapshots: RgsSnapshot[];
-  new_red?: (RgsBriefRow & { metric: string; label: string; value: number | null })[];
-  moved?: (RgsBriefRow & { from: string; to: string })[];
-  plan_moves?: (RgsBriefRow & { old: string; new: string; days: number })[];
-  ru_soon?: (RgsBriefRow & { plan: string; days: number })[];
-  added?: RgsBriefRow[];
-}

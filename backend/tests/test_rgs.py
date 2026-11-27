@@ -454,13 +454,6 @@ async def test_plan_move_and_history(env, tmp_path, today):
     ]
     assert set(kpi) == {"kpis", "dynamics"}
     assert kpi["kpis"][2]["value"] == 31
-    changes = (await owner.get("/api/rgs/AZ/changes")).json()
-    assert changes["base"]["date"] == "2026-11-09"
-    assert [(m["tm"], m["to"]) for m in changes["moved"]] == [
-        ("PANOLECT", "2-я экспертиза оплачена"),
-    ]
-    assert [m["days"] for m in changes["plan_moves"]] == [5]
-    assert changes["new_red"] == [] and changes["added"] == []
     snaps = (await owner.get("/api/rgs/AZ/snapshots")).json()["items"]
     assert len(snaps) == 2 and snaps[0]["current"]
     removed = await owner.delete(f"/api/imports/{snaps[0]['id']}")
@@ -471,9 +464,9 @@ async def test_plan_move_and_history(env, tmp_path, today):
     assert card["plan_moves"] == []
 
 
-async def test_changes_without_base(env, tmp_path, today):
+async def test_single_snapshot_dynamics(env, tmp_path, today):
     owner = await _upload(env, tracker(tmp_path / "a.xlsx"))
-    data = (await owner.get("/api/rgs/AZ/changes")).json()
-    assert data["base"] is None and data["snapshots"] == []
     kpi = (await owner.get("/api/rgs/AZ/kpi")).json()
     assert len(kpi["dynamics"]) == 1
+    gone = await owner.get("/api/rgs/AZ/changes")
+    assert gone.status_code == 404

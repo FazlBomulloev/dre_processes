@@ -2,7 +2,7 @@ import asyncio
 import io
 import logging
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.responses import StreamingResponse
@@ -21,7 +21,7 @@ from backend.services.audit import record
 from backend.services.cache import LruCache, cached
 from backend.services.rgs import analytics as an
 from backend.services.rgs import store
-from backend.services.rgs.history import changes, item_key, snapshot_date
+from backend.services.rgs.history import item_key, snapshot_date
 from backend.services.rgs.settings import settings
 
 log = logging.getLogger(__name__)
@@ -46,7 +46,6 @@ _EXPORT_COLUMNS = (
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 MAX_TMS = 200
 DYNAMICS = 6
-MEETING_DAYS = 14
 
 CACHE = LruCache(max_items=300)
 ITEMS = LruCache(max_items=16)
@@ -388,51 +387,3 @@ async def kpi(
         return {"kpis": an.kpis(evs, t.settings), "dynamics": points}
 
     return await cached(CACHE, t.key("kpi", cat, ids), build)
-
-
-def _base_of(history: list[Import], current: Import) -> Import | None:
-    others = sorted(
-        (imp for imp in history if imp.id != current.id),
-        key=lambda imp: (_when(imp), imp.id),
-    )
-    if not others:
-        return None
-    limit = _when(current) - timedelta(days=MEETING_DAYS)
-    older = [imp for imp in others if _when(imp) <= limit]
-    return older[-1] if older else others[0]
-
-
-@router.get("/changes")
-async def meeting_changes(
-    base: int | None = Query(None, ge=1),
-    cat: str | None = Query(None, pattern=_CAT),
-    t: Tracker = Depends(tracker),
-    db: AsyncSession = Depends(get_db),
-):
-    history = await store.snapshots(db, t.market.id)
-    picked = (
-        next((imp for imp in history if imp.id == base), None)
-        if base else _base_of(history, t.imp)
-    )
-    if base and picked is None:
-        raise HTTPException(404, "Снимок не найден")
-    sc = an.Scope(cat=cat)
-    out = {
-        "current": _snapshot_out(t.imp),
-        "base": _snapshot_out(picked) if picked else None,
-        "snapshots": [
-            _snapshot_out(imp) for imp in history if imp.id != t.imp.id
-        ],
-    }
-    if picked is None:
-        return out
-    items, s = await _snapshot(db, t, picked)
-
-    def build() -> dict:
-        return {**out, **changes(
-            an.active_evs(t.items, t.settings, sc),
-            an.active_evs(items, s, sc),
-            t.settings.norms.get("ru_warn"),
-        )}
-
-    return await cached(CACHE, t.key("changes", picked.id, cat), build)
